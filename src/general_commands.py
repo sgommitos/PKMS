@@ -1,4 +1,4 @@
-import os
+from datetime import datetime
 
 from slibs.timing     import wait_ms
 
@@ -27,7 +27,6 @@ match platform.system():
         failed_return()
         
 class GeneralCommands:
-
     def __init__(self, configurator: JSON_Configurator):
         self.configurator = configurator
 
@@ -36,6 +35,40 @@ class GeneralCommands:
         # --------------------------------- #
         
         self.BASIC_CMD_DELAY_MS = 200
+
+    # ==================================================== #
+
+    def _create_daily_note(self, daily_note_template_file="templates/daily_note_template.md"):
+        # Generate timestamp
+        now = datetime.now()
+        timestamp = now.strftime("%Y-%m-%d")
+        
+        # Create daily note filename
+        daily_note_filename = f"{self.configurator.pkms_daily_path}{timestamp}{self.configurator.note_format}"
+    
+        try:
+            # Read template content
+            with open(daily_note_template_file, 'r', encoding='utf-8') as f:
+                template_content = f.read()
+            
+            # Create new content with timestamp header
+            new_content = f"# {timestamp}\n\n{template_content}"
+            
+            # Write to new file
+            with open(daily_note_filename, 'w', encoding='utf-8') as f:
+                f.write(new_content)
+                
+            print(f"Created: {daily_note_filename}")
+            return daily_note_filename
+            
+        except FileNotFoundError:
+            print(fg_text(f"Error: Template file '{daily_note_template_file}' not found!", RED))
+            return None
+        except Exception as e:
+            print(fg_text(f"Error: {e}", RED))
+            return None
+
+    # ==================================================== #
 
     def print_logo(self) -> None:
         sw_splashscreen = f"""
@@ -77,14 +110,15 @@ class GeneralCommands:
     
     def help(self) -> None:
         help_str = f"""
-        ==================== General Commands ====================
+        ===================== General Commands =====================
         - about        → print SW info
         - dependencies → print SW dependencies
         - quit         → quit SW
         - clear        → clear  terminal
-        ===================== Notes Commands =====================
+        ======================= Notes Commands ======================
         - ls           → list all your notes in setup pkm folder
-        ==========================================================
+        - daily        → open (or create, if not exists) daily note
+        =============================================================
         """
 
         print(help_str)
@@ -100,14 +134,23 @@ class GeneralCommands:
 
         return
 
+    def unrecognized_cmd(self) -> None:
+        print(fg_text("Unrecognized cmd!", RED))
+
+        return
+
     # ==================================================== #
 
     def ls(self) -> None:
         execute_os_cmd(f"ls {self.configurator.pkms_path} | grep '{self.configurator.note_format}'")
         
         return
+    
+    def daily(self) -> None:
+        daily_note_filename = self._create_daily_note()
+        
+        if daily_note_filename:
+            execute_os_cmd(f"{self.configurator.text_editor} {daily_note_filename}")
 
-    def unrecognized_cmd(self) -> None:
-        print(fg_text("Unrecognized cmd!", RED))
-
-        return
+        return   
+    

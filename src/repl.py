@@ -8,6 +8,7 @@
 
 from slibs.timing         import wait_ms
 from slibs.linux_exec     import success_return, failed_return 
+from slibs.printl         import *
 
 from src.general_commands import GeneralCommands
 from src.configurator     import JSON_Configurator
@@ -33,7 +34,7 @@ def repl() -> None:
 
     try:
         while(True):
-            print("PKMS > ", end="")
+            print(bold_text("\nPKMS > "), end="")
             
             user_input = input().lower()
 
@@ -53,6 +54,8 @@ def repl() -> None:
                 
                 case "ls":
                     cmd.ls()
+                case "daily":
+                    cmd.daily()
                 case _ :
                     cmd.unrecognized_cmd()
 

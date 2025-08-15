@@ -6,7 +6,8 @@
     "PATHS":
     {
         "PKM": "/home/sgommitos/Desktop/pkms",
-        "TEXT_EDITOR": "micro"
+        "TEXT_EDITOR": "micro",
+        "DAILY": "/home/sgommitos/Desktop/pkms/daily"
     },
     "FILE_TYPES":
     {

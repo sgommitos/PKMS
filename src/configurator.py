@@ -7,10 +7,11 @@ class JSON_Configurator:
 
         self._read_main_config() 
 
-        self.user         = self.main_config["USER_DATA"]["NAME"]
-        self.pkms_path    = self.main_config["PATHS"]["PKM"]
-        self.text_editor  = self.main_config["PATHS"]["TEXT_EDITOR"]
-        self.note_format  = self.main_config["FILE_TYPES"]["NOTES"]
+        self.user            = self.main_config["USER_DATA"]["NAME"]
+        self.pkms_path       = self.main_config["PATHS"]["PKM"]
+        self.pkms_daily_path = self.main_config["PATHS"]["DAILY"]
+        self.text_editor     = self.main_config["PATHS"]["TEXT_EDITOR"]
+        self.note_format     = self.main_config["FILE_TYPES"]["NOTES"]
 
         # ====================================== #
 
