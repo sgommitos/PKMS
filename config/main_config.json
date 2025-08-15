@@ -1,0 +1,11 @@
+{
+    "PATHS":
+    {
+        "PKM": "/home/sgommitos/Desktop/pkms",
+        "TEXT_EDITOR": "micro"
+    },
+    "FILE_TYPES":
+    {
+        "NOTES": ".md"
+    }
+}
