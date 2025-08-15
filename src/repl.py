@@ -52,8 +52,8 @@ def repl() -> None:
 
                 # =============================== #
                 
-                case "ls":
-                    cmd.ls()
+                case s if s.startswith("ls"):
+                    cmd.ls(s[3:])
                 case "daily":
                     cmd.daily()
                 case _ :

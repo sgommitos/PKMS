@@ -141,10 +141,19 @@ class GeneralCommands:
 
     # ==================================================== #
 
-    def ls(self) -> None:
-        execute_os_cmd(f"ls {self.configurator.pkms_path} | grep '{self.configurator.note_format}'")
+    def ls(self, notes_filter: str) -> None:
+        if not notes_filter:
+            execute_os_cmd(f"ls {self.configurator.pkms_path} | grep '{self.configurator.note_format}'")
+            return
         
-        return
+        else:
+            notes_filter = notes_filter.split(" ")
+
+            if "daily" in notes_filter:
+                execute_os_cmd(f"ls {self.configurator.pkms_daily_path} | grep '{self.configurator.note_format}'")
+                return
+        
+        
     
     def daily(self) -> None:
         daily_note_filename = self._create_daily_note()
