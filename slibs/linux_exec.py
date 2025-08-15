@@ -22,6 +22,8 @@ def execute_os_cmd(cmd: str) -> None:
 
     return
 
+# ======================================= #
+
 def success_return() -> None:
     sys.exit(0)
 

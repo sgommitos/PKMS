@@ -37,7 +37,7 @@ class GeneralCommands:
         
         self.BASIC_CMD_DELAY_MS = 200
 
-    def print_welcome(self) -> None:
+    def print_logo(self) -> None:
         sw_splashscreen = f"""
 ██████╗ ██╗  ██╗███╗   ███╗███████╗
 ██╔══██╗██║ ██╔╝████╗ ████║██╔════╝
@@ -45,11 +45,14 @@ class GeneralCommands:
 ██╔═══╝ ██╔═██╗ ██║╚██╔╝██║╚════██║
 ██║     ██║  ██╗██║ ╚═╝ ██║███████║
 ╚═╝     ╚═╝  ╚═╝╚═╝     ╚═╝╚══════╝
-
-Welcome back, {self.configurator.user}!
 """
-
         print(fg_text(sw_splashscreen, BLUE))
+
+        return
+
+    def print_welcome(self) -> None:
+        self.print_logo()
+        print(fg_text(f"Welcome back, {self.configurator.user}!", BLUE))
 
         return   
 
@@ -67,6 +70,9 @@ Welcome back, {self.configurator.user}!
 
     def clear(self) -> None:
         execute_os_cmd("clear")
+        self.print_logo()
+
+        return
 
     
     def help(self) -> None:
