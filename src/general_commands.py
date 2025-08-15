@@ -108,6 +108,6 @@ class GeneralCommands:
         return
 
     def unrecognized_cmd(self) -> None:
-        print("Unrecognized cmd!")
+        print(fg_text("Unrecognized cmd!", RED))
 
         return
