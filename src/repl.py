@@ -33,7 +33,7 @@ def repl() -> None:
 
     try:
         while(True):
-            print("pkbs > ", end="")
+            print("PKMS > ", end="")
             
             user_input = input().lower()
 

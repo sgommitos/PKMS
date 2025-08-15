@@ -103,8 +103,9 @@ class GeneralCommands:
     # ==================================================== #
 
     def ls(self) -> None:
-        print
-
+        execute_os_cmd(f"ls {self.configurator.pkms_path} | grep '{self.configurator.note_format}'")
+        
+        return
 
     def unrecognized_cmd(self) -> None:
         print("Unrecognized cmd!")
