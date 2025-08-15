@@ -6,7 +6,7 @@ from src.configurator import JSON_Configurator
 
 from slibs.printl     import *
 
-from slibs.debug_tools import *
+from slibs.debug_tools import not_implemented, not_fully_implemented
 
 # --------------------------------- #
 # ---- Discrimite which OS is ----- # 
@@ -27,7 +27,7 @@ match platform.system():
         failed_return()
         
 class GeneralCommands:
- 
+
     def __init__(self, configurator: JSON_Configurator):
         self.configurator = configurator
 
@@ -46,16 +46,17 @@ class GeneralCommands:
 ██║     ██║  ██╗██║ ╚═╝ ██║███████║
 ╚═╝     ╚═╝  ╚═╝╚═╝     ╚═╝╚══════╝
 
-{self.configurator.sw_version} - © sgommitos
+Welcome back, {self.configurator.user}!
 """
 
         print(fg_text(sw_splashscreen, BLUE))
 
         return   
 
-    @not_implemented
+    @not_fully_implemented()
     def about(self) -> None:
-        pass
+        print(f"- SW Version: {self.configurator.sw_version}")
+        print("- Author: - sgommitos© (https://github.com/sgommitos)")
 
     def quit(self) -> None:
         print("\r\033[KBye by(t)e!")  # @NOTE: delete ^C from REPL output  
@@ -66,6 +67,7 @@ class GeneralCommands:
 
     def clear(self) -> None:
         execute_os_cmd("clear")
+
     
     def help(self) -> None:
         help_str = f"""
