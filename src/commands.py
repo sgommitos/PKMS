@@ -31,7 +31,7 @@ class REPL_Commands:
             
             "help"         : [self.help,              "general_command", "Print a list of available cmd (within relative description)"],
             "about"        : [self.about,             "general_command", "Print SW info"],
-            "depencencies" : [self.dependecies,       "general_command", "Print SW dependencies"],
+            "credits"      : [self.credits,           "general_command", "Print SW credits"],
             "clear"        : [self.clear,             "general_command", "Clear REPL terminal"],
             "exit"         : [self.quit,              "general_command", "Quit REPL"],
             "quit"         : [self.quit,              "general_command", "Quit REPL"],
@@ -100,8 +100,9 @@ class REPL_Commands:
 ██████╔╝█████╔╝ ██╔████╔██║███████╗
 ██╔═══╝ ██╔═██╗ ██║╚██╔╝██║╚════██║
 ██║     ██║  ██╗██║ ╚═╝ ██║███████║
-╚═╝     ╚═╝  ╚═╝╚═╝     ╚═╝╚══════╝
-"""
+╚═╝     ╚═╝  ╚═╝╚═╝     ╚═╝╚══════╝ 
+"""     
+        
         print(fg_text(sw_splashscreen, BLUE))
 
         return
@@ -142,10 +143,9 @@ class REPL_Commands:
         return True
 
     @not_fully_implemented()
-    def dependecies() -> bool:
+    def credits() -> bool:
         dependencies_str = f"""
-        - ASCII-Art generation                           ⟹ https://patorjk.com/software/taag/
-        - Moebius Triangle ASCII-Art (by Michael Naylor) ⟹ https://www.asciiart.eu/art-and-design/escher
+        - ASCII-Art generation (by patorjk.com) ⟹ https://patorjk.com/software/taag/#p=display&f=ANSI%20Shadow&t=PKMS
         """
 
         print(dependencies_str)
