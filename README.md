@@ -34,7 +34,7 @@ TBI.
 
 ### Planned
 
-- [ ] Entire PKM Encryption
+- [ ] Entire User-Data Folder Encryption
 - [ ] [`rclone`](https://rclone.org/) integration
 
 ### Would be nice
