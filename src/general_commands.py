@@ -1,4 +1,5 @@
 from datetime import datetime
+from pathlib import Path
 
 from slibs.timing     import wait_ms
 
@@ -34,7 +35,7 @@ class GeneralCommands:
         # --- Define classes attributes --- #
         # --------------------------------- #
         
-        self.BASIC_CMD_DELAY_MS = 200
+        self.BASIC_CMD_DELAY_MS = 250
 
     # ==================================================== #
 
@@ -45,7 +46,13 @@ class GeneralCommands:
         
         # Create daily note filename
         daily_note_filename = f"{self.configurator.pkms_daily_path}{timestamp}{self.configurator.note_format}"
-    
+
+        # If file already exists, then just return the 'daily_note_filename' var (i.e: file path)
+        if os.path.exists(daily_note_filename):
+            print(fg_text("File already exists; just opening it", BLUE))
+            wait_ms(self.BASIC_CMD_DELAY_MS)
+            return daily_note_filename
+
         try:
             # Read template content
             with open(daily_note_template_file, 'r', encoding='utf-8') as f:
@@ -59,6 +66,7 @@ class GeneralCommands:
                 f.write(new_content)
                 
             print(f"Created: {daily_note_filename}")
+            wait_ms(self.BASIC_CMD_DELAY_MS)
             return daily_note_filename
             
         except FileNotFoundError:
