@@ -6,12 +6,11 @@
 ███████ ██ ██████  ██   ██ ██   ██ ██   ██ ██ ███████ ███████ 
 """
 
-from slibs.timing         import wait_ms
-from slibs.linux_exec     import success_return, failed_return 
-from slibs.printl         import *
+from slibs.os_discriminator import *
+from slibs.printl           import *
 
-from src.general_commands import GeneralCommands
-from src.configurator     import JSON_Configurator
+from src.commands           import REPL_Commands
+from src.configurator       import JSON_Configurator
 
 """
 ███████ ██    ██ ███    ██  ██████ ████████ ██  ██████  ███    ██ ███████ 
@@ -24,41 +23,18 @@ from src.configurator     import JSON_Configurator
 # =============================================================================================== #
 
 def repl() -> None:
-    configurator = JSON_Configurator(main_config_file    = "config/main_config.json", 
-                                     sw_info_config_file = "config/sw_info_config.json")
-    cmd          = GeneralCommands(configurator)
+    configurator      = JSON_Configurator(main_config_file = "config/main_config.json", sw_info_config_file = "config/sw_info_config.json")
+    repl_cmd_handler  = REPL_Commands(configurator)
 
     # ========================================================= #
 
-    cmd.print_welcome()
+    repl_cmd_handler.print_welcome()
 
-    try:
-        while(True):
-            print(bold_text("\nPKMS > "), end="")
-            
-            user_input = input().lower()
-
-            match user_input:
-                case "help":
-                    cmd.help()
-                case "about":
-                    cmd.about()
-                case "depencencies":
-                    cmd.dependecies()
-                case "exit" | "quit" | "-q":
-                    cmd.quit()
-                case "clear":
-                    cmd.clear()
-
-                # =============================== #
-                
-                case s if s.startswith("ls"):
-                    cmd.ls(s[3:])
-                case "daily":
-                    cmd.daily()
-                case _ :
-                    cmd.unrecognized_cmd()
-
-    except KeyboardInterrupt:
-        pass
+    while(True):
+        print(bold_text("\nPKMS > "), end="")
+        
+        user_input = input()
+        
+        if not repl_cmd_handler.exec_repl_cmd(user_input): fail_return()
+    
                             

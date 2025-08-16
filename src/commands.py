@@ -1,6 +1,8 @@
 from datetime import datetime
 from pathlib import Path
 
+from slibs.os_discriminator import *
+
 from slibs.timing     import wait_ms
 
 from src.configurator import JSON_Configurator
@@ -13,21 +15,8 @@ from slibs.debug_tools import not_implemented, not_fully_implemented
 # ---- Discrimite which OS is ----- # 
 # ------ running this script ------ #
 # --------------------------------- #
-
-import platform
-
-match platform.system():
-    case "Linux":
-        from slibs.linux_exec   import * 
-    case "Darwin":   
-        from slibs.macos_exec   import *
-    case "Windows":
-        from slibs.windows_exec import *
-    case _:          
-        print(fg_text(f"OS NOT recognized ⟹ aborting SW execution"), RED)
-        failed_return()
         
-class GeneralCommands:
+class REPL_Commands:
     def __init__(self, configurator: JSON_Configurator):
         self.configurator = configurator
 
@@ -36,6 +25,22 @@ class GeneralCommands:
         # --------------------------------- #
         
         self.BASIC_CMD_DELAY_MS = 250
+
+        self.commands_dict = {
+            # --- General Commands --- #
+            
+            "help"         : [self.help,              "general_command", "Print a list of available cmd (within relative description)"],
+            "about"        : [self.about,             "general_command", "Print SW info"],
+            "depencencies" : [self.dependecies,       "general_command", "Print SW dependencies"],
+            "clear"        : [self.clear,             "general_command", "Clear REPL terminal"],
+            "exit"         : [self.quit,              "general_command", "Quit REPL"],
+            "quit"         : [self.quit,              "general_command", "Quit REPL"],
+
+            # --- Notes Commands --- #
+
+            "ls"           : [self.ls,                "notes_cmd",       "List all your notes in setup pkm folder"],
+            "daily"        : [self.daily,             "notes_cmd",       "Open (or create, if not exists) daily note"],
+        }
 
     # ==================================================== #
 
@@ -78,6 +83,16 @@ class GeneralCommands:
 
     # ==================================================== #
 
+    def exec_repl_cmd(self, cmd):
+        cmd = cmd.lower().strip()
+        
+        if cmd in self.commands_dict:
+            func, category, description = self.commands_dict[cmd]
+            return func()
+        else:
+            self.unrecognized_cmd()
+            return True
+
     def print_logo(self) -> None:
         sw_splashscreen = f"""
 ██████╗ ██╗  ██╗███╗   ███╗███████╗
@@ -98,9 +113,11 @@ class GeneralCommands:
         return   
 
     @not_fully_implemented()
-    def about(self) -> None:
+    def about(self) -> bool:
         print(f"- SW Version: {self.configurator.sw_version}")
         print("- Author: - sgommitos© (https://github.com/sgommitos)")
+
+        return True
 
     def quit(self) -> None:
         print("\r\033[KBye by(t)e!")  # @NOTE: delete ^C from REPL output  
@@ -109,65 +126,49 @@ class GeneralCommands:
         
         success_return()
 
-    def clear(self) -> None:
+    def clear(self, is_logo=False) -> bool:
         execute_os_cmd("clear")
-        self.print_logo()
+        
+        if is_logo:
+            self.print_logo()
 
-        return
+        return True
 
-    
-    def help(self) -> None:
-        help_str = f"""
-        ===================== General Commands =====================
-        - about        → print SW info
-        - dependencies → print SW dependencies
-        - quit         → quit SW
-        - clear        → clear  terminal
-        ======================= Notes Commands ======================
-        - ls           → list all your notes in setup pkm folder
-        - daily        → open (or create, if not exists) daily note
-        =============================================================
-        """
+    @not_fully_implemented()
+    def help(self) -> bool:
+        for cmd, (function, category, description) in self.commands_dict.items():
+            print(f"{cmd:14} ⟹   {description}")
 
-        print(help_str)
+        return True
 
-        return
-
-    def dependecies() -> None:
+    @not_fully_implemented()
+    def dependecies() -> bool:
         dependencies_str = f"""
-        - ASCII-Art generation: https://patorjk.com/software/taag/
+        - ASCII-Art generation                           ⟹ https://patorjk.com/software/taag/
+        - Moebius Triangle ASCII-Art (by Michael Naylor) ⟹ https://www.asciiart.eu/art-and-design/escher
         """
 
         print(dependencies_str)
 
-        return
+        return True
 
-    def unrecognized_cmd(self) -> None:
+    def unrecognized_cmd(self) -> bool:
         print(fg_text("Unrecognized cmd!", RED))
 
-        return
+        return True
 
     # ==================================================== #
 
-    def ls(self, notes_filter: str) -> None:
-        if not notes_filter:
-            execute_os_cmd(f"ls {self.configurator.pkms_path} | grep '{self.configurator.note_format}'")
-            return
+    def ls(self) -> bool:
+        execute_os_cmd(f"ls {self.configurator.pkms_path} | grep '{self.configurator.note_format}'")
         
-        else:
-            notes_filter = notes_filter.split(" ")
-
-            if "daily" in notes_filter:
-                execute_os_cmd(f"ls {self.configurator.pkms_daily_path} | grep '{self.configurator.note_format}'")
-                return
+        return True
         
-        
-    
-    def daily(self) -> None:
+    def daily(self) -> bool:
         daily_note_filename = self._create_daily_note()
         
         if daily_note_filename:
             execute_os_cmd(f"{self.configurator.text_editor} {daily_note_filename}")
 
-        return   
+        return True  
     

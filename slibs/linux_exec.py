@@ -27,5 +27,5 @@ def execute_os_cmd(cmd: str) -> None:
 def success_return() -> None:
     sys.exit(0)
 
-def failed_return() -> None:
+def fail_return() -> None:
     sys.exit(1)
