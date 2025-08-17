@@ -1,8 +1,5 @@
 # README
 
-> [!WARNING]
-> This `README` file is under development, like the whole project.
-
 > [!NOTE] 
 > This SW is at the early stage of development ⟹ it could be affected by major changes. <br/><br/>
 > Also, consider that it's developed as a side-project without any pretention, so the SW architecture will grow within time (and personal needs :P). <br/><br/>
@@ -10,7 +7,9 @@
 
 ## Introduction
 
-`PKMS`, which stands for *Personal Knowledge Management System*, is a SW which consists in a REPL, used to handle user's PKM.
+`PKMS`, which stands for *Personal Knowledge Management System*, is a SW which consists in a REPL, used to handle user's PKM:
+
+![](docs/imgs/poc.png)
 
 First thing first, this SW focused on `user-privacy` ⟹ **All data are stored into user PC**, and **no internet connection is required for local use**[^1] 
 
