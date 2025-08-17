@@ -29,6 +29,10 @@ Talking about the other characteristics, the goal to achieve is to create a SW t
 
 Due to that, `PKMS` will be (mainly)[^2] developed using Python.
 
+## SW features
+
+- `UTF-8` usage 
+
 ## How it works
 
 TBI.
