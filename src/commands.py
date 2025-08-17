@@ -34,12 +34,12 @@ class REPL_Commands:
         self.commands_dict = {
             # --- General Commands --- #
             
-            "help"         : [self.help,              "general_command", "Print a list of available cmd (within relative description)"],
-            "about"        : [self.about,             "general_command", "Print SW info"],
-            "credits"      : [self.credits,           "general_command", "Print SW credits"],
-            "clear"        : [self.clear,             "general_command", "Clear REPL terminal"],
-            "exit"         : [self.quit,              "general_command", "Quit REPL"],
-            "quit"         : [self.quit,              "general_command", "Quit REPL"],
+            "help"         : [self.help,              "general_cmd", "Print a list of available cmd (within relative description)"],
+            "about"        : [self.about,             "general_cmd", "Print SW info"],
+            "credits"      : [self.credits,           "general_cmd", "Print SW credits"],
+            "clear"        : [self.clear,             "general_cmd", "Clear REPL terminal"],
+            "exit"         : [self.quit,              "general_cmd", "Quit REPL"],
+            "quit"         : [self.quit,              "general_cmd", "Quit REPL"],
 
             # --- Notes Commands --- #
 
@@ -47,10 +47,24 @@ class REPL_Commands:
             "daily"        : [self.daily,             "notes_cmd",       "Open (or create, if not exists) daily note"],
         }
 
+        self.general_commands_list = []
+        self.notes_commands_list   = []
+
+        self._pupulate_commands_lists()
+
         self.completer = WordCompleter(list(self.commands_dict.keys()))
         self.history   = FileHistory(configurator.cli_history)
 
-    # ==================================================== #
+    # ===================================================================================================================== #
+
+    def _pupulate_commands_lists(self) -> None:
+        for cmd, (function, category, description) in self.commands_dict.items():
+            match category:
+                case "general_cmd" : self.general_commands_list.append([cmd, description]) 
+                case "notes_cmd"   : self.notes_commands_list.append([cmd, description])
+                case _             : continue
+
+        return
 
     def _create_daily_note(self, daily_note_template_file="templates/daily_note_template.md"):
         # Generate timestamp
@@ -89,7 +103,7 @@ class REPL_Commands:
             print(fg_text(f"Error: {e}", RED))
             return None
 
-    # ==================================================== #
+    # ===================================================================================================================== #
 
     def get_user_input(self) -> str:
         """
@@ -133,19 +147,23 @@ class REPL_Commands:
 
     @not_fully_implemented()
     def about(self) -> bool:
-        print(f"- SW Version: {self.configurator.sw_version}")
-        print("- Author: - sgommitos© (https://github.com/sgommitos)")
+        about_str = f"""
+⦁ SW Version: {self.configurator.sw_version}
+⦁ Author: - sgommitos© (https://github.com/sgommitos)
+"""
+        
+        print(about_str)
 
         return True
 
     def quit(self) -> None:
         print("\r\033[KBye by(t)e!")  # @NOTE: delete ^C from REPL output  
         wait_ms(self.BASIC_CMD_DELAY_MS)
-        self.clear()
+        self.clear(is_logo=False)
         
         success_return()
 
-    def clear(self, is_logo=False) -> bool:
+    def clear(self, is_logo=True) -> bool:
         execute_os_cmd("clear")
         
         if is_logo:
@@ -153,23 +171,30 @@ class REPL_Commands:
 
         return True
 
-    @not_fully_implemented
     def help(self) -> bool:
-        for cmd, (function, category, description) in self.commands_dict.items():
-            print(f"{cmd:14} ⟹   {description}")
+        print("\n=============================== General Commands ===============================\n")
+        for cmd, description in self.general_commands_list:
+            print(f"⦁ {cmd:14} ⟹   {description}")
+
+        print("\n================================ Notes Commands ================================\n")
+        for cmd, description in self.notes_commands_list:
+            print(f"⦁ {cmd:14} ⟹   {description}")
+        
+        print("\n================================================================================\n")
 
         return True
 
     @not_fully_implemented()
     def credits() -> bool:
         dependencies_str = f"""
-        =================================================== Assets =================================================== 
+        ======================================== Assets ======================================= 
         
-        - ASCII-Art generation (by patorjk.com) ⟹ https://patorjk.com/software/taag/#p=display&f=ANSI%20Shadow&t=PKMS
+        ⦁ ASCII-Art (font: Shadow) ⟹ https://patorjk.com/software/taag
+            ◦ Fonts: 'Shadow' (Logo)
         
-        ============================================== Python libraries ==============================================
+        ====================================== Python libs ====================================
         
-        - prompt-toolkit                        ⟹ https://github.com/prompt-toolkit/python-prompt-toolkit
+        ⦁ prompt-toolkit           ⟹ https://github.com/prompt-toolkit/python-prompt-toolkit
         """
 
         print(dependencies_str)
