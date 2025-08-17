@@ -17,8 +17,11 @@ First thing first, this SW focused on `user-privacy` ⟹ **All data are stored i
 Talking about the other characteristics, the goal to achieve is to create a SW that is:
 
 - Simple 
-    - In terms of development : it should follow the *suckless* SW development philosophy
-    - In terms of usability   : it should be as simple as possible for everybody, even if it's not used to use terminal
+    - In terms of development: 
+        - It should follow the *suckless* SW development philosophy
+        - It should use as few external dependencies as possible (and, if used, FOSS)
+    - In terms of usability: 
+        - It should be as simple as possible for everybody, even if it's not used to use terminal
 - Cross-Platform
     - It should run on the major OS (i.e: Linux, MacOS, Windows)
 - User-Edit-Ready:
