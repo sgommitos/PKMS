@@ -26,7 +26,7 @@ Talking about the other characteristics, the goal to achieve is to create a SW t
 - User-Edit-Ready:
     - Everybody should be able to edit the code themselves. 
 
-Due to that, `PKMS` will be (mainly)[^2] developed using Python.
+Due to that, `PKMS` will be (mainly)[^2] developed using `Python`.
 
 ## SW features
 
