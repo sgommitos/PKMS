@@ -30,6 +30,15 @@ Due to that, `PKMS` will be (mainly)[^2] developed using Python.
 
 TBI.
 
+## Dependencies
+
+### Python libraries
+
+- [`python-prompt-toolkit`](https://github.com/prompt-toolkit/python-prompt-toolkit)
+    - Used for:
+        - Autocompletion
+        - Commands History
+
 ## Implementation
 
 ### Planned
