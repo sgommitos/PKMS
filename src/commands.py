@@ -1,15 +1,19 @@
 from datetime import datetime
 from pathlib import Path
 
-from slibs.os_discriminator import *
+# --- REPL Autocomplete && History dependencies --- #
+from prompt_toolkit            import prompt
+from prompt_toolkit.completion import WordCompleter
+from prompt_toolkit.history    import FileHistory
+import os
+# ------------------------------------------------- #
 
-from slibs.timing     import wait_ms
+from slibs.os_discriminator    import *
+from slibs.timing              import wait_ms
+from slibs.printl              import *
+from slibs.debug_tools         import not_implemented, not_fully_implemented
 
-from src.configurator import JSON_Configurator
-
-from slibs.printl     import *
-
-from slibs.debug_tools import not_implemented, not_fully_implemented
+from src.configurator          import JSON_Configurator
 
 # --------------------------------- #
 # ---- Discrimite which OS is ----- # 
@@ -24,7 +28,8 @@ class REPL_Commands:
         # --- Define classes attributes --- #
         # --------------------------------- #
         
-        self.BASIC_CMD_DELAY_MS = 250
+        self.REPL_prompt_keyword = "PKMS> "  
+        self.BASIC_CMD_DELAY_MS  = 250
 
         self.commands_dict = {
             # --- General Commands --- #
@@ -41,6 +46,9 @@ class REPL_Commands:
             "ls"           : [self.ls,                "notes_cmd",       "List all your notes in setup pkm folder"],
             "daily"        : [self.daily,             "notes_cmd",       "Open (or create, if not exists) daily note"],
         }
+
+        self.completer = WordCompleter(list(self.commands_dict.keys()))
+        self.history   = FileHistory(configurator.cli_history)
 
     # ==================================================== #
 
@@ -83,7 +91,17 @@ class REPL_Commands:
 
     # ==================================================== #
 
-    def exec_repl_cmd(self, cmd):
+    def get_user_input(self) -> str:
+        """
+        @brief: get user input, using autocomplete and history features
+        """
+        return prompt(
+            self.REPL_prompt_keyword,
+            completer=self.completer,
+            history=self.history
+        )
+
+    def exec_repl_cmd(self, cmd: str):
         cmd = cmd.lower().strip()
         
         if cmd in self.commands_dict:
@@ -135,7 +153,7 @@ class REPL_Commands:
 
         return True
 
-    @not_fully_implemented()
+    @not_fully_implemented
     def help(self) -> bool:
         for cmd, (function, category, description) in self.commands_dict.items():
             print(f"{cmd:14} ⟹   {description}")
@@ -145,7 +163,13 @@ class REPL_Commands:
     @not_fully_implemented()
     def credits() -> bool:
         dependencies_str = f"""
+        =================================================== Assets =================================================== 
+        
         - ASCII-Art generation (by patorjk.com) ⟹ https://patorjk.com/software/taag/#p=display&f=ANSI%20Shadow&t=PKMS
+        
+        ============================================== Python libraries ==============================================
+        
+        - prompt-toolkit                        ⟹ https://github.com/prompt-toolkit/python-prompt-toolkit
         """
 
         print(dependencies_str)

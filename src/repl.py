@@ -23,7 +23,7 @@ from src.configurator       import JSON_Configurator
 # =============================================================================================== #
 
 def repl() -> None:
-    configurator      = JSON_Configurator(main_config_file = "config/main_config.json", sw_info_config_file = "config/sw_info_config.json")
+    configurator      = JSON_Configurator(user_config_file = "config/user_config.json", sw_data_tree_file = "sw_files/sw_data_tree.json")
     repl_cmd_handler  = REPL_Commands(configurator)
 
     # ========================================================= #
@@ -31,10 +31,8 @@ def repl() -> None:
     repl_cmd_handler.print_welcome()
 
     while(True):
-        print(bold_text("\nPKMS > "), end="")
-        
-        user_input = input()
-        
+        user_input = repl_cmd_handler.get_user_input()
+
         if not repl_cmd_handler.exec_repl_cmd(user_input): fail_return()
     
                             

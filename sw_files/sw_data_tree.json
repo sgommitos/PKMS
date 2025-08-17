@@ -1,0 +1,12 @@
+{
+    "VERSION":
+    {
+        "MAJOR"     : "0",
+        "MINOR"     : "1",
+        "BUILD_STR" : "DEV release"
+    },
+    "SW_FILES_PATHS":
+    {
+        "HISTORY": "sw_files/repl_history"
+    }
+}
