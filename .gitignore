@@ -5,3 +5,6 @@ __pycache__/
 
 # Virtual enviroment
 venv/
+
+# Prompt-toolkit
+sw_files/repl_history

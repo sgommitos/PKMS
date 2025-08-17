@@ -1,6 +1,3 @@
-from datetime import datetime
-from pathlib import Path
-
 # --- REPL Autocomplete && History dependencies --- #
 from prompt_toolkit            import prompt
 from prompt_toolkit.completion import WordCompleter
@@ -9,7 +6,7 @@ import os
 # ------------------------------------------------- #
 
 from slibs.os_discriminator    import *
-from slibs.timing              import wait_ms
+from slibs.timing              import compute_date, wait_ms
 from slibs.printl              import *
 from slibs.debug_tools         import not_implemented, not_fully_implemented
 
@@ -66,13 +63,12 @@ class REPL_Commands:
 
         return
 
-    def _create_daily_note(self, daily_note_template_file="templates/daily_note_template.md"):
-        # Generate timestamp
-        now = datetime.now()
-        timestamp = now.strftime("%Y-%m-%d")
+    def _create_daily_note(self, daily_note_template_file: str) -> str | None:
+        timestamp = compute_date()
         
         # Create daily note filename
-        daily_note_filename = f"{self.configurator.pkms_daily_path}{timestamp}{self.configurator.note_format}"
+        daily_note_filename = f"{self.configurator.daily_path}/{timestamp}{self.configurator.notes_format}"
+        print(daily_note_filename)
 
         # If file already exists, then just return the 'daily_note_filename' var (i.e: file path)
         if os.path.exists(daily_note_filename):
@@ -82,22 +78,21 @@ class REPL_Commands:
 
         try:
             # Read template content
-            with open(daily_note_template_file, 'r', encoding='utf-8') as f:
-                template_content = f.read()
+            with open(daily_note_template_file, 'r', encoding='utf-8') as file:
+                template_content = file.read()
             
             # Create new content with timestamp header
             new_content = f"# {timestamp}\n\n{template_content}"
             
             # Write to new file
-            with open(daily_note_filename, 'w', encoding='utf-8') as f:
-                f.write(new_content)
+            with open(daily_note_filename, 'w', encoding='utf-8') as file:
+                file.write(new_content)
                 
             print(f"Created: {daily_note_filename}")
             wait_ms(self.BASIC_CMD_DELAY_MS)
             return daily_note_filename
-            
         except FileNotFoundError:
-            print(fg_text(f"Error: Template file '{daily_note_template_file}' not found!", RED))
+            print(fg_text(f"Error: '{daily_note_template_file}' or {daily_note_filename} not found!", RED))
             return None
         except Exception as e:
             print(fg_text(f"Error: {e}", RED))
@@ -209,12 +204,13 @@ class REPL_Commands:
     # ==================================================== #
 
     def ls(self) -> bool:
-        execute_os_cmd(f"ls {self.configurator.pkms_path} | grep '{self.configurator.note_format}'")
+        execute_os_cmd(f"ls {self.configurator.pkm_path} | grep '{self.configurator.notes_format}'")
         
         return True
         
     def daily(self) -> bool:
-        daily_note_filename = self._create_daily_note()
+        daily_note_template_file = f"{self.configurator.templates_path}/{self.configurator.user_config["TEMPLATES"]["DAILY_NOTE_TEMPLATE"]}{self.configurator.notes_format}"
+        daily_note_filename = self._create_daily_note(daily_note_template_file = daily_note_template_file)
         
         if daily_note_filename:
             execute_os_cmd(f"{self.configurator.text_editor} {daily_note_filename}")

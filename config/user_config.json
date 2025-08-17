@@ -7,10 +7,15 @@
     {
         "PKM": "~/Desktop/pkms",
         "TEXT_EDITOR": "micro",
-        "DAILY": "~/Desktop/pkms/daily"
+        "DAILY": "daily",
+        "TEMPLATES": "templates" 
     },
     "FILE_TYPES":
     {
         "NOTES": ".md"
+    },
+    "TEMPLATES":
+    {
+        "DAILY_NOTE_TEMPLATE" : "daily_note_template"
     }
 }

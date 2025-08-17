@@ -29,7 +29,7 @@ def compute_timestamp(is_date=False, ms_decimal_digits=3) -> str:
 def compute_date() -> str:
     now = datetime.now()
 
-    return str(now.strftime("%d/%m/%y"))
+    return str(now.strftime("%Y-%m-%d"))
 
 def wait_ms(ms) -> None:
     time.sleep(ms/1000)
