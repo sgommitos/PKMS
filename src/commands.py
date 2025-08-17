@@ -185,7 +185,7 @@ class REPL_Commands:
         return True
 
     @not_fully_implemented()
-    def credits() -> bool:
+    def credits(self) -> bool:
         dependencies_str = f"""
         ======================================== Assets ======================================= 
         
