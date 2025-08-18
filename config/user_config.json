@@ -6,9 +6,10 @@
     "PATHS":
     {
         "PKM": "~/Desktop/pkms",
-        "TEXT_EDITOR": "micro",
-        "DAILY": "daily",
-        "TEMPLATES": "templates" 
+        "TEXT_EDITOR"  : "micro",
+        "DAILY"        : "daily",
+        "TEMPLATES"    : "templates",
+        "FINANCES"     : "finances"   
     },
     "FILE_TYPES":
     {

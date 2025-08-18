@@ -16,6 +16,8 @@ class JSON_Configurator:
         
         self.pkm_path        = Path(self.user_config["PATHS"]["PKM"]).expanduser()
         self.daily_path      = f"{self.pkm_path}/{self.user_config["PATHS"]["DAILY"]}"
+        self.finances_path   = f"{self.pkm_path}/{self.user_config["PATHS"]["FINANCES"]}"
+        
         self.templates_path  = f"{self.sw_path}/{self.user_config["PATHS"]["TEMPLATES"]}"
         
         self.text_editor     = self.user_config["PATHS"]["TEXT_EDITOR"]
