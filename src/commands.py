@@ -10,7 +10,7 @@ from slibs.timing              import compute_date, wait_ms
 from slibs.printl              import *
 from slibs.debug_tools         import not_implemented, not_fully_implemented
 
-from src.configurator          import JSON_Configurator
+from src.configurator          import Configurator
 
 # --------------------------------- #
 # ---- Discrimite which OS is ----- # 
@@ -18,7 +18,7 @@ from src.configurator          import JSON_Configurator
 # --------------------------------- #
         
 class REPL_Commands:
-    def __init__(self, configurator: JSON_Configurator):
+    def __init__(self, configurator: Configurator):
         self.configurator = configurator
 
         # --------------------------------- #
@@ -37,6 +37,7 @@ class REPL_Commands:
             "clear"        : [self.clear,             "general_cmd", "Clear REPL terminal"],
             "exit"         : [self.quit,              "general_cmd", "Quit REPL"],
             "quit"         : [self.quit,              "general_cmd", "Quit REPL"],
+            "reload"       : [self.reload,            "general_cmd", "Reload SW configuration files"],
 
             # --- Notes Commands --- #
 
@@ -139,6 +140,11 @@ class REPL_Commands:
         print(fg_text(f"Welcome back, {self.configurator.user}!", BLUE))
 
         return   
+
+    # ================================================================================ #
+
+    def reload(self) -> bool:
+        return self.configurator._load_configs()
 
     @not_fully_implemented()
     def about(self) -> bool:

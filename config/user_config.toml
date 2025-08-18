@@ -1,0 +1,21 @@
+# PKMS: User configuration file
+
+[USER_DATA]
+NAME = "sgommitos"
+
+[PATHS]
+PKM = "~/Desktop/pkms"               
+TEXT_EDITOR = "micro"                  
+DAILY = "daily"                     
+TEMPLATES = "templates"             
+FINANCES = "finances"               
+
+[FILE_TYPES]
+NOTES = ".md"                       
+
+[TEMPLATES]
+DAILY_NOTE_TEMPLATE = "daily_note_template"  
+
+[SHORTCUTS]
+help = ""
+clear = ""                          
