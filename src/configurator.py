@@ -14,17 +14,19 @@ class Configurator:
 
         # ====================================================================== #
  
-        self.user            = self.user_config["USER_DATA"]["NAME"]
+        self.user                    = self.user_config["USER_DATA"]["NAME"]
         
-        self.pkm_path        = Path(self.user_config["PATHS"]["PKM"]).expanduser()
-        self.daily_path      = f"{self.pkm_path}/{self.user_config["PATHS"]["DAILY"]}"
-        self.finances_path   = f"{self.pkm_path}/{self.user_config["PATHS"]["FINANCES"]}"
+        self.pkm_path                = Path(self.user_config["PATHS"]["PKM"]).expanduser()
+        self.daily_path              = f"{self.pkm_path}/{self.user_config["PATHS"]["DAILY"]}"
+        self.finances_path           = f"{self.pkm_path}/{self.user_config["PATHS"]["FINANCES"]}"
         
-        self.templates_path  = f"{self.sw_path}/{self.user_config["PATHS"]["TEMPLATES"]}"
+        self.templates_path          = f"{self.sw_path}/{self.user_config["PATHS"]["TEMPLATES"]}"
         
-        self.text_editor     = self.user_config["PATHS"]["TEXT_EDITOR"]
-        self.notes_format    = self.user_config["FILE_TYPES"]["NOTES"]
+        self.text_editor             = self.user_config["PATHS"]["TEXT_EDITOR"]
+        self.notes_format            = self.user_config["FILE_TYPES"]["NOTES"]
 
+        self.user_shortcuts_bindings = self.user_config["SHORTCUTS"] # @NOTE: the result is a dict
+        
         # ====================================================================== #
 
         self.sw_version     = f"v{self.sw_data_tree["VERSION"]["MAJOR"]}.{self.sw_data_tree["VERSION"]["MINOR"]} ({self.sw_data_tree["VERSION"]["BUILD_STR"]})"

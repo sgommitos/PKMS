@@ -1,22 +1,19 @@
-# --- REPL Autocomplete && History dependencies --- #
-from prompt_toolkit            import prompt
-from prompt_toolkit.completion import WordCompleter
-from prompt_toolkit.history    import FileHistory
+# --- REPL: Autocomplete, History and KeyBindings dependencies --- #
+from prompt_toolkit             import prompt
+from prompt_toolkit.completion  import WordCompleter
+from prompt_toolkit.history     import FileHistory
+from prompt_toolkit.key_binding import KeyBindings
+from prompt_toolkit.keys        import Keys
 import os
 # ------------------------------------------------- #
 
-from slibs.os_discriminator    import *
-from slibs.timing              import compute_date, wait_ms
-from slibs.printl              import *
-from slibs.debug_tools         import not_implemented, not_fully_implemented
+from slibs.os_discriminator     import *
+from slibs.timing               import compute_date, wait_ms
+from slibs.printl               import *
+from slibs.debug_tools          import not_implemented, not_fully_implemented
 
-from src.configurator          import Configurator
+from src.configurator           import Configurator
 
-# --------------------------------- #
-# ---- Discrimite which OS is ----- # 
-# ------ running this script ------ #
-# --------------------------------- #
-        
 class REPL_Commands:
     def __init__(self, configurator: Configurator):
         self.configurator = configurator
@@ -25,7 +22,7 @@ class REPL_Commands:
         # --- Define classes attributes --- #
         # --------------------------------- #
         
-        self.REPL_prompt_keyword = "PKMS> "  
+        self.REPL_prompt_keyword = "\nPKMS> "  
         self.BASIC_CMD_DELAY_MS  = 250
 
         self.commands_dict = {
@@ -48,14 +45,20 @@ class REPL_Commands:
         self.general_commands_list = []
         self.notes_commands_list   = []
 
-        self._pupulate_commands_lists()
+        self._populate_commands_lists()
+
+        self.user_shortcuts        = {}
+        self._populate_user_shortcuts_dict()
+        
+        self.bindings = None
+        self._setup_keybindigs() 
 
         self.completer = WordCompleter(list(self.commands_dict.keys()))
         self.history   = FileHistory(configurator.cli_history)
 
     # ===================================================================================================================== #
 
-    def _pupulate_commands_lists(self) -> None:
+    def _populate_commands_lists(self) -> None:
         for cmd, (function, category, description) in self.commands_dict.items():
             match category:
                 case "general_cmd" : self.general_commands_list.append([cmd, description]) 
@@ -64,6 +67,42 @@ class REPL_Commands:
 
         return
 
+    def _populate_user_shortcuts_dict(self) -> None:
+        
+        # Create some temporany structures to perform easily some comparison between our 2 involved dicts
+        user_config_file_cmds_list = set(self.configurator.user_shortcuts_bindings.keys())
+        sw_implemented_cmds_list   = set(self.commands_dict.keys()) 
+
+        binded_cmds_list           = user_config_file_cmds_list & sw_implemented_cmds_list
+        unbinded_cmds_list         = sw_implemented_cmds_list   - user_config_file_cmds_list  
+        unavailable_cmds_list      = user_config_file_cmds_list - sw_implemented_cmds_list
+
+        # WITHOUT BLOCKING SW EXECUTION, inform user if some cmds he binded it's not unavailable
+        if unavailable_cmds_list:
+            for cmd in unavailable_cmds_list:
+                print(fg_text(f"ERROR: User cmd {cmd:10} (within its shortcut) it's not unavailable", RED))
+            
+            print()
+        
+        # Populate 'self.user_shortcuts' dict
+        for cmd in binded_cmds_list:
+            self.user_shortcuts.update({cmd : self.configurator.user_shortcuts_bindings[cmd]})
+        for cmd in unbinded_cmds_list:
+            self.user_shortcuts.update({cmd : ""})
+
+        return 
+
+    def _setup_keybindigs(self) -> None:
+        # Initialize KeyBindings registry
+        self.bindings = KeyBindings()
+
+        # Create bindings dinamically
+        for cmd, shortcut in self.user_shortcuts.items():
+            if shortcut != '':
+                @self.bindings.add(shortcut)
+                def handler(event, function=self.commands_dict[cmd][0]):
+                    function()
+                    
     def _create_daily_note(self, daily_note_template_file: str) -> str | None:
         timestamp = compute_date()
         
@@ -142,7 +181,7 @@ class REPL_Commands:
         return   
 
     # ================================================================================ #
-
+    
     def reload(self) -> bool:
         return self.configurator._load_configs()
 
@@ -172,6 +211,7 @@ class REPL_Commands:
 
         return True
 
+    # TODO: implement setup shortcut
     def help(self) -> bool:
         print("\n=============================== General Commands ===============================\n")
         for cmd, description in self.general_commands_list:

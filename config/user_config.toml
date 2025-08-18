@@ -17,5 +17,7 @@ NOTES = ".md"
 DAILY_NOTE_TEMPLATE = "daily_note_template"  
 
 [SHORTCUTS]
-help = ""
-clear = ""                          
+# @NOTE: 'c' stands for 'CTRL' key
+help  = "c-h" # @EXAMPLE: 'c-h' correspondes to hit 'CTRL + H' keys
+clear = "c-l"
+quit  = "c-q"                           
