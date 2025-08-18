@@ -49,8 +49,6 @@ class REPL_Commands:
 
         self.user_shortcuts        = {}
         self._populate_user_shortcuts_dict()
-        
-        self.bindings = None
         self._setup_keybindigs() 
 
         self.completer = WordCompleter(list(self.commands_dict.keys()))
@@ -99,9 +97,17 @@ class REPL_Commands:
         # Create bindings dinamically
         for cmd, shortcut in self.user_shortcuts.items():
             if shortcut != '':
-                @self.bindings.add(shortcut)
-                def handler(event, function=self.commands_dict[cmd][0]):
-                    function()
+                """
+                @NOTE: store for each cycle function pointer in order to avoid its 
+                       overwriting(s) ⟹ preventing 'late binding closure' bug
+                """
+                cmd_function = self.commands_dict[cmd][0] 
+            
+                self.bindings.add(shortcut.strip())(
+                    lambda event, function=cmd_function: function()
+                )
+
+        return
                     
     def _create_daily_note(self, daily_note_template_file: str) -> str | None:
         timestamp = compute_date()
@@ -146,6 +152,7 @@ class REPL_Commands:
         """
         return prompt(
             self.REPL_prompt_keyword,
+            key_bindings=self.bindings,
             completer=self.completer,
             history=self.history
         )
