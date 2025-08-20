@@ -14,13 +14,24 @@ from slibs.debug_tools          import not_implemented, not_fully_implemented
 from src.configurator           import Configurator
 
 class REPL_Commands:
+    
+    """
+    ░█▀▀░█░█░░░▀█▀░█▀█░▀█▀░▀█▀
+    ░▀▀█░█▄█░░░░█░░█░█░░█░░░█░
+    ░▀▀▀░▀░▀░░░▀▀▀░▀░▀░▀▀▀░░▀░
+    """
+
+    """
+    ┏┓ ┏━╸
+    ┣┻┓┣╸ 
+    ┗━┛┗━╸
+    """
+    
     def __init__(self, configurator: Configurator):
         self.configurator = configurator
 
-        # --------------------------------- #
         # --- Define classes attributes --- #
-        # --------------------------------- #
-        
+
         self.REPL_prompt_keyword = "\nPKMS> "  
         self.BASIC_CMD_DELAY_MS  = 250
 
@@ -38,6 +49,7 @@ class REPL_Commands:
             # --- Notes Commands --- #
 
             "ls"           : [self.ls,                "notes_cmd",       "List all your notes in setup pkm folder"],
+            "random"       : [self.random,            "notes_cmd",       "Read a random note from your pkms folder"],
             "daily"        : [self.daily,             "notes_cmd",       "Open (or create, if not exists) daily note"],
         }
 
@@ -53,8 +65,6 @@ class REPL_Commands:
         self.completer = WordCompleter(list(self.commands_dict.keys()))
         self.history   = FileHistory(configurator.cli_history)
 
-    # ===================================================================================================================== #
-    
     def _populate_commands_lists(self) -> None:
         for cmd, (function, category, description) in self.commands_dict.items():
             match category:
@@ -107,43 +117,12 @@ class REPL_Commands:
                 )
 
         return
-                    
-    def _create_daily_note(self, daily_note_template_file: str) -> str | None:
-        timestamp = compute_date()
-        
-        # Create daily note filename
-        daily_note_filename = f"{self.configurator.daily_path}/{timestamp}{self.configurator.notes_format}"
-        print(daily_note_filename)
 
-        # If file already exists, then just return the 'daily_note_filename' var (i.e: file path)
-        if os.path.exists(daily_note_filename):
-            print(fg_text("File already exists; just opening it", BLUE))
-            wait_ms(self.BASIC_CMD_DELAY_MS)
-            return daily_note_filename
-
-        try:
-            # Read template content
-            with open(daily_note_template_file, 'r', encoding='utf-8') as file:
-                template_content = file.read()
-            
-            # Create new content with timestamp header
-            new_content = f"# {timestamp}\n\n{template_content}"
-            
-            # Write to new file
-            with open(daily_note_filename, 'w', encoding='utf-8') as file:
-                file.write(new_content)
-                
-            print(f"Created: {daily_note_filename}")
-            wait_ms(self.BASIC_CMD_DELAY_MS)
-            return daily_note_filename
-        except FileNotFoundError:
-            print(fg_text(f"Error: '{daily_note_template_file}' or {daily_note_filename} not found!", RED))
-            return None
-        except Exception as e:
-            print(fg_text(f"Error: {e}", RED))
-            return None
-
-    # ===================================================================================================================== #
+    """
+    ┏━╸┏┳┓╺┳┓┏━┓
+    ┃  ┃┃┃ ┃┃┗━┓
+    ┗━╸╹ ╹╺┻┛┗━┛
+    """
 
     def get_user_input(self) -> str:
         """
@@ -184,9 +163,32 @@ class REPL_Commands:
         self.print_logo()
         print(fg_text(f"Welcome back, {self.configurator.user}!", BLUE))
 
-        return   
+        return 
 
-    # ================================================================================ #
+    def unrecognized_cmd(self) -> bool:
+        print(fg_text("Unrecognized cmd!", RED))
+
+        return True  
+
+    """
+    ░█▀▀░█▀▀░█▀█░█▀▀░█▀▄░█▀█░█░░░░░█▀▀░█░█░█▀█░█▀▀░▀█▀░▀█▀░█▀█░█▀█░█▀▀
+    ░█░█░█▀▀░█░█░█▀▀░█▀▄░█▀█░█░░░░░█▀▀░█░█░█░█░█░░░░█░░░█░░█░█░█░█░▀▀█
+    ░▀▀▀░▀▀▀░▀░▀░▀▀▀░▀░▀░▀░▀░▀▀▀░░░▀░░░▀▀▀░▀░▀░▀▀▀░░▀░░▀▀▀░▀▀▀░▀░▀░▀▀▀
+    """
+
+    """
+    ┏┓ ┏━╸
+    ┣┻┓┣╸ 
+    ┗━┛┗━╸
+    """
+
+    # Nothing here
+
+    """
+    ┏━╸┏┳┓╺┳┓┏━┓
+    ┃  ┃┃┃ ┃┃┗━┓
+    ┗━╸╹ ╹╺┻┛┗━┛
+    """
     
     def reload(self) -> bool:
         if (self.configurator._load_configs()):
@@ -228,7 +230,6 @@ class REPL_Commands:
 
         return True
 
-    # TODO: implement setup shortcut
     def help(self) -> bool:
         print("\n================================ General Commands ================================\n")
         for cmd, description in self.general_commands_list:
@@ -242,13 +243,12 @@ class REPL_Commands:
 
         return True
 
-    @not_fully_implemented()
     def credits(self) -> bool:
         dependencies_str = f"""
         ======================================== Assets ======================================= 
         
         ⦁ ASCII-Art (font: Shadow) ⟹ https://patorjk.com/software/taag
-            ◦ Fonts: 'Shadow' (Logo)
+            ◦ Fonts: 'Shadow' (Logo), 'Pagga' (code comments subsection), 'Future' (code comments subsubsections)'
         
         ====================================== Python libs ====================================
         
@@ -259,18 +259,68 @@ class REPL_Commands:
 
         return True
 
-    def unrecognized_cmd(self) -> bool:
-        print(fg_text("Unrecognized cmd!", RED))
+    """
+    ░█▀█░█▀█░▀█▀░█▀▀░█▀▀░░░█▀▀░█░█░█▀█░█▀▀░▀█▀░▀█▀░█▀█░█▀█░█▀▀
+    ░█░█░█░█░░█░░█▀▀░▀▀█░░░█▀▀░█░█░█░█░█░░░░█░░░█░░█░█░█░█░▀▀█
+    ░▀░▀░▀▀▀░░▀░░▀▀▀░▀▀▀░░░▀░░░▀▀▀░▀░▀░▀▀▀░░▀░░▀▀▀░▀▀▀░▀░▀░▀▀▀
+    """
+    
+    """
+    ┏┓ ┏━╸
+    ┣┻┓┣╸ 
+    ┗━┛┗━╸
+    """
 
-        return True
+    def _create_daily_note(self, daily_note_template_file: str) -> str | None:
+        timestamp = compute_date()
+        
+        # Create daily note filename
+        daily_note_filename = f"{self.configurator.daily_path}/{timestamp}{self.configurator.notes_format}"
+        print(daily_note_filename)
 
-    # ==================================================== #
+        # If file already exists, then just return the 'daily_note_filename' var (i.e: file path)
+        if os.path.exists(daily_note_filename):
+            print(fg_text("File already exists; just opening it", BLUE))
+            wait_ms(self.BASIC_CMD_DELAY_MS)
+            return daily_note_filename
+
+        try:
+            # Read template content
+            with open(daily_note_template_file, 'r', encoding='utf-8') as file:
+                template_content = file.read()
+            
+            # Create new content with timestamp header
+            new_content = f"# {timestamp}\n\n{template_content}"
+            
+            # Write to new file
+            with open(daily_note_filename, 'w', encoding='utf-8') as file:
+                file.write(new_content)
+                
+            print(f"Created: {daily_note_filename}")
+            wait_ms(self.BASIC_CMD_DELAY_MS)
+            return daily_note_filename
+        except FileNotFoundError:
+            print(fg_text(f"Error: '{daily_note_template_file}' or {daily_note_filename} not found!", RED))
+            return None
+        except Exception as e:
+            print(fg_text(f"Error: {e}", RED))
+            return None
+
+    """
+    ┏━╸┏┳┓╺┳┓┏━┓
+    ┃  ┃┃┃ ┃┃┗━┓
+    ┗━╸╹ ╹╺┻┛┗━┛
+    """
 
     def ls(self) -> bool:
         execute_os_cmd(f"ls {self.configurator.pkm_path} | grep '{self.configurator.notes_format}'")
         
         return True
-        
+
+    @not_implemented
+    def random(self) -> bool:
+        pass
+
     def daily(self) -> bool:
         daily_note_template_file = f"{self.configurator.templates_path}/{self.configurator.user_config["TEMPLATES"]["DAILY_NOTE_TEMPLATE"]}{self.configurator.notes_format}"
         daily_note_filename = self._create_daily_note(daily_note_template_file = daily_note_template_file)
