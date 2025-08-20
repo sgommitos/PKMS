@@ -25,6 +25,8 @@ class Configurator:
         self.text_editor             = self.user_config["PATHS"]["TEXT_EDITOR"]
         self.notes_format            = self.user_config["FILE_TYPES"]["NOTES"]
 
+        self.file_list_order         = self.user_config["FILE_ORDER"]["LIST"]
+
         self.user_shortcuts_bindings = self.user_config["SHORTCUTS"] # @NOTE: the result is a dict
         
         # ====================================================================== #

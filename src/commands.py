@@ -8,8 +8,8 @@ import os
 
 from slibs.os_discriminator     import *
 from slibs.timing               import compute_date, wait_ms
-from slibs.printl               import fg_text, RED, GREEN, BLUE
-from slibs.debug_tools          import not_implemented, not_fully_implemented
+from slibs.printl               import fg_text, italic_text, bold_text, RED, GREEN, BLUE
+from slibs.debug_tools          import not_implemented, to_reimplement, not_fully_implemented
 
 from src.configurator           import Configurator
 
@@ -48,15 +48,19 @@ class REPL_Commands:
 
             # --- Notes Commands --- #
 
-            "ls"           : [self.ls,                "notes_cmd",       "List all your notes in setup pkm folder"],
-            "random"       : [self.random,            "notes_cmd",       "Read a random note from your pkms folder"],
-            "daily"        : [self.daily,             "notes_cmd",       "Open (or create, if not exists) daily note"],
+            "lsn"          : [self.lsn,               "notes_cmd",   "List all your notes in setup pkm folder"],
+            "lsi"          : [self.lsi,               "notes_cmd",   "List all your imgs (.png, .jpeg, .jpg) in setup pkm folder"],
+            "random"       : [self.random,            "notes_cmd",   "Read a random note from your pkms folder"],
+            "daily"        : [self.daily,             "notes_cmd",   "Open (or create, if not exists) daily note"],
         }
 
         self.general_commands_list = []
         self.notes_commands_list   = []
-
         self._populate_commands_lists()
+
+        self.pkm_notes_files = {}
+        self.pkm_imgs_files  = {}
+        self._populate_pkm_file_lists()
 
         self.user_shortcuts        = {}
         self._populate_user_shortcuts_dict()
@@ -95,10 +99,43 @@ class REPL_Commands:
         for cmd in binded_cmds_list:
             self.user_shortcuts.update({cmd : self.configurator.user_shortcuts_bindings[cmd]})
         for cmd in unbinded_cmds_list:
-            self.user_shortcuts.update({cmd : ""})
+            self.user_shortcuts.update({cmd : ''})
 
         return 
 
+    def _populate_pkm_file_lists(self) -> None:        
+        unsorted_files = os.listdir(self.configurator.pkm_path)
+        
+        # @NOTE: get files based on the order specified in user_config; if blank, it use 'newer' order by default
+        match self.configurator.file_list_order.lower():
+                case "alphabetic" :
+                    sorted_files = sorted(unsorted_files, key=str.lower)
+                case "older"      :
+                    sorted_files = sorted(unsorted_files, key=lambda x: os.path.getmtime(os.path.join(self.configurator.pkm_path, x)), reverse=False)  
+                case "newer"      :
+                    sorted_files = sorted(unsorted_files, key=lambda x: os.path.getmtime(os.path.join(self.configurator.pkm_path, x)), reverse=True)  
+                case _            :
+                    sorted_files = sorted(unsorted_files, key=lambda x: os.path.getmtime(os.path.join(self.configurator.pkm_path, x)), reverse=True)  
+
+        for filename in sorted_files:
+            target_filename = filename.lower()
+            
+            if target_filename.endswith(self.configurator.notes_format):
+                # @NOTE: before update dict, check that is a file (i.e: NOT a directory)
+                
+                filepath = os.path.join(self.configurator.pkm_path, filename)
+                if os.path.isfile(filepath):
+                    self.pkm_notes_files.update({filename: filepath})
+            
+            elif (target_filename.endswith('.png')) or (target_filename.endswith('.jpg')) or (target_filename.endswith('.jpeg')):
+                # @NOTE: before update dict, check that is a file (i.e: NOT a directory)
+                
+                filepath = os.path.join(self.configurator.pkm_path, filename)
+                if os.path.isfile(filepath):
+                    self.pkm_imgs_files.update({filename: filepath})
+            
+        return
+    
     def _setup_keybindigs(self) -> None:
         # Initialize KeyBindings registry
         self.bindings = KeyBindings()
@@ -312,10 +349,30 @@ class REPL_Commands:
     ┗━╸╹ ╹╺┻┛┗━┛
     """
 
-    def ls(self) -> bool:
+    def lsn(self) -> bool:
+        for note in self.pkm_notes_files:
+            print(f"⦁ {italic_text(note)}")
+        
+        print(f"\nA total of {bold_text(f"{len(self.pkm_notes_files)} notes")} were found")
+        
+        return True
+        
+        """
         execute_os_cmd(f"ls {self.configurator.pkm_path} | grep '{self.configurator.notes_format}'")
         
         return True
+        """
+
+    @not_implemented
+    def lsi(self) -> bool:
+        pass 
+
+    @not_implemented
+    def note(self) -> bool:
+        notes_name = input("   1. Write your note's name: ")
+        
+        return True
+
 
     @not_implemented
     def random(self) -> bool:

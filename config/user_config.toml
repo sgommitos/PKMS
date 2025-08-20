@@ -11,7 +11,10 @@ TEMPLATES = "templates"
 FINANCES = "finances"               
 
 [FILE_TYPES]
-NOTES = ".md"                       
+NOTES = ".md"
+
+[FILE_ORDER]
+LIST = "newer" # Available order filters: "alphabetic", "older", "newer"           
 
 [TEMPLATES]
 DAILY_NOTE_TEMPLATE = "daily_note_template"  
