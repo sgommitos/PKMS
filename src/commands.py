@@ -3,7 +3,6 @@ from prompt_toolkit             import prompt
 from prompt_toolkit.completion  import WordCompleter
 from prompt_toolkit.history     import FileHistory
 from prompt_toolkit.key_binding import KeyBindings
-from prompt_toolkit.keys        import Keys
 import os
 # ------------------------------------------------- #
 
