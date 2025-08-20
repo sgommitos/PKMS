@@ -3,7 +3,8 @@
 > [!WARNING] 
 > This SW is at the early stage of development ⟹ it could be affected by major changes. <br/><br/>
 > Also, consider that it's developed as a side-project without any pretention, so the SW architecture will grow within time (and personal needs :P). <br/><br/>
-> As i started these project during my holidays (i'm honestly writing this `README` next to the pool), i'm aware that i will need to enhanced project structure and logic.
+> As i started these project during my holidays (i'm honestly writing this `README` next to the pool), i'm aware that i will need to enhanced project structure and logic. <br/><br/><br/>
+> *Issues*, *PR* and suggestions are always valued!
 
 ## Introduction
 
@@ -38,6 +39,9 @@ TBI.
 
 ## Dependencies
 
+As i said before, one of my personal goal for this project is to use as few external dependencies as possible.
+BTW, some dependencies make development a way faster and help me to provide a SW whose codebase remains (i hope) easy to understand.
+
 ### Python libraries
 
 - [`python-prompt-toolkit`](https://github.com/prompt-toolkit/python-prompt-toolkit)
@@ -47,6 +51,10 @@ TBI.
         - Keybindings (i.e: user-customizable keyboard shortcuts)
 
 ## Implementation
+
+> [!IMPORTANT]
+> When (and if, i hope :D) the project will reach a sufficiently complete and usable state, i'll summarize the main features here. <br/>
+> Anyone interested in the project can use the `help` command to quickly check which features are available (and their development status).
 
 ### Planned
 
