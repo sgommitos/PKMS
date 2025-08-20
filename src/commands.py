@@ -230,15 +230,15 @@ class REPL_Commands:
 
     # TODO: implement setup shortcut
     def help(self) -> bool:
-        print("\n=============================== General Commands ===============================\n")
+        print("\n================================ General Commands ================================\n")
         for cmd, description in self.general_commands_list:
-            print(f"⦁ {cmd:14} ⟹   {description}")
+            print(f"⦁ {cmd:10} ({self.user_shortcuts[cmd]:3}) ⟹   {description}")
 
-        print("\n================================ Notes Commands ================================\n")
+        print("\n================================= Notes Commands =================================\n")
         for cmd, description in self.notes_commands_list:
-            print(f"⦁ {cmd:14} ⟹   {description}")
+            print(f"⦁ {cmd:10} ({self.user_shortcuts[cmd]:3}) ⟹   {description}")
         
-        print("\n================================================================================\n")
+        print("\n==================================================================================\n")
 
         return True
 
