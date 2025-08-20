@@ -44,6 +44,7 @@ TBI.
     - Used for:
         - Autocompletion
         - Commands History
+        - Keybindings (i.e: user-customizable keyboard shortcuts)
 
 ## Implementation
 
