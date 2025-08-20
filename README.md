@@ -3,8 +3,8 @@
 > [!WARNING] 
 > This SW is at the early stage of development ⟹ it could be affected by major changes. <br/><br/>
 > Also, consider that it's developed as a side-project without any pretention, so the SW architecture will grow within time (and personal needs :P). <br/><br/>
-> As i started these project during my holidays (i'm honestly writing this `README` next to the pool), i'm aware that i will need to enhanced project structure and logic. <br/><br/><br/>
-> *Issues*, *PR* and suggestions are always valued!
+> As i started these project during my holidays (i'm honestly writing this `README` next to the pool), i'm aware that i will need to enhanced project structure and logic. <br/><br/>
+> ***Issues*, *PR* and suggestions are always valued!**
 
 ## Introduction
 
