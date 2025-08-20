@@ -9,7 +9,7 @@ import os
 
 from slibs.os_discriminator     import *
 from slibs.timing               import compute_date, wait_ms
-from slibs.printl               import *
+from slibs.printl               import fg_text, RED, GREEN, BLUE
 from slibs.debug_tools          import not_implemented, not_fully_implemented
 
 from src.configurator           import Configurator
@@ -55,7 +55,7 @@ class REPL_Commands:
         self.history   = FileHistory(configurator.cli_history)
 
     # ===================================================================================================================== #
-
+    
     def _populate_commands_lists(self) -> None:
         for cmd, (function, category, description) in self.commands_dict.items():
             match category:
@@ -104,7 +104,7 @@ class REPL_Commands:
                 cmd_function = self.commands_dict[cmd][0] 
             
                 self.bindings.add(shortcut.strip())(
-                    lambda event, function=cmd_function: function()
+                    lambda event, function=cmd_function: ( function(), print(self.REPL_prompt_keyword, end="") )
                 )
 
         return
@@ -190,7 +190,18 @@ class REPL_Commands:
     # ================================================================================ #
     
     def reload(self) -> bool:
-        return self.configurator._load_configs()
+        if (self.configurator._load_configs()):
+            self.clear(is_logo=False)
+
+            while input(fg_text("PKMS successfully reloaded! Press Return to restart REPL: ", GREEN)) is None: pass
+            
+            self.clear(is_logo=False)
+            self.print_welcome()
+            
+            return True
+        
+        print(fg_text("Error during SW reload! Please check user configuration files", RED))
+        return False
 
     @not_fully_implemented()
     def about(self) -> bool:
