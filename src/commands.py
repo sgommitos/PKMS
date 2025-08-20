@@ -6,9 +6,11 @@ from prompt_toolkit.key_binding import KeyBindings
 import os
 # ------------------------------------------------- #
 
+from datetime import datetime
+
 from slibs.os_discriminator     import *
 from slibs.timing               import compute_date, wait_ms
-from slibs.printl               import fg_text, italic_text, bold_text, RED, GREEN, BLUE
+from slibs.printl               import fg_text, bg_text, italic_text, bold_text, RED, GREEN, BLUE
 from slibs.debug_tools          import not_implemented, to_reimplement, not_fully_implemented
 
 from src.configurator           import Configurator
@@ -61,6 +63,7 @@ class REPL_Commands:
         self.pkm_notes_files = {}
         self.pkm_imgs_files  = {}
         self._populate_pkm_file_lists()
+        self._compute_pkm_notes_stats()
 
         self.user_shortcuts        = {}
         self._populate_user_shortcuts_dict()
@@ -125,17 +128,42 @@ class REPL_Commands:
                 
                 filepath = os.path.join(self.configurator.pkm_path, filename)
                 if os.path.isfile(filepath):
-                    self.pkm_notes_files.update({filename: filepath})
+                    self.pkm_notes_files.update({filename: [filepath, datetime.fromtimestamp(os.stat(filepath).st_mtime).strftime('%Y/%m/%d - %H:%M:%S')]})
             
             elif (target_filename.endswith('.png')) or (target_filename.endswith('.jpg')) or (target_filename.endswith('.jpeg')):
                 # @NOTE: before update dict, check that is a file (i.e: NOT a directory)
                 
                 filepath = os.path.join(self.configurator.pkm_path, filename)
                 if os.path.isfile(filepath):
-                    self.pkm_imgs_files.update({filename: filepath})
-            
+                    self.pkm_imgs_files.update({filename: [filepath, datetime.fromtimestamp(os.stat(filepath).st_mtime).strftime('%Y/%m/%d - %H:%M:%S')]})
+
         return
     
+    def _compute_pkm_notes_stats(self) -> None:
+        datetimes = [note_timestamp for _, (_, note_timestamp) in self.pkm_notes_files.items()]
+        
+        self.notes_newest_datetime  = max(datetimes)
+        notes_newest_datetime_obj   = datetime.strptime(self.notes_newest_datetime, "%Y/%m/%d - %H:%M:%S")
+        
+        self.notes_oldest_datetime  = min(datetimes)
+        notes_oldest_datetime_obj   = datetime.strptime(self.notes_oldest_datetime, "%Y/%m/%d - %H:%M:%S")
+
+        notes_delta_timestamp_obj = notes_newest_datetime_obj - notes_oldest_datetime_obj
+        self.notes_delta_timestamp = {
+            "years"  : notes_delta_timestamp_obj.days // 365,  
+            "months" : notes_delta_timestamp_obj.days // 30,  
+            "days"   : notes_delta_timestamp_obj.days
+        }
+
+        self.notes_delta_timestamp = {
+            # @NOTE: computing date only
+            "years"   : (notes_newest_datetime_obj.year - notes_oldest_datetime_obj.year),
+            "months"  : (notes_newest_datetime_obj.month - notes_oldest_datetime_obj.month), 
+            "days"    : (notes_newest_datetime_obj.day - notes_oldest_datetime_obj.day),
+        }  
+
+        return
+
     def _setup_keybindigs(self) -> None:
         # Initialize KeyBindings registry
         self.bindings = KeyBindings()
@@ -349,23 +377,34 @@ class REPL_Commands:
     ┗━╸╹ ╹╺┻┛┗━┛
     """
 
+    @not_fully_implemented()
+    # TODO: implement subfolders count and print, like 'daily' folder
     def lsn(self) -> bool:
-        for note in self.pkm_notes_files:
-            print(f"⦁ {italic_text(note)}")
-        
-        print(f"\nA total of {bold_text(f"{len(self.pkm_notes_files)} notes")} were found")
-        
-        return True
-        
+        stats_str = f"""
+        \rnA total of {bold_text(f"{len(self.pkm_notes_files)} notes")} was found.
+        \rYou've been keeping your note for {self.notes_delta_timestamp["years"]} year(s), {self.notes_delta_timestamp["months"]} month(s), {self.notes_delta_timestamp["days"]} day(s)!
         """
-        execute_os_cmd(f"ls {self.configurator.pkm_path} | grep '{self.configurator.notes_format}'")
         
-        return True
-        """
+        print(stats_str)
 
-    @not_implemented
+        for note, (_, note_timestamp) in self.pkm_notes_files.items():
+            print(f"⦁ {(italic_text(note.ljust(50)))} ({note_timestamp})")
+        
+        return True
+
+    @not_fully_implemented()
+    # TODO: implement subfolders count and print, like 'daily' folder
     def lsi(self) -> bool:
-        pass 
+        stats_str = f"""
+        \rnA total of {bold_text(f"{len(self.pkm_imgs_files)} imgs")} was found.
+        """
+        
+        print(stats_str)
+
+        for img, (_, img_timestamp) in self.pkm_imgs_files.items():
+            print(f"⦁ {(italic_text(img.ljust(50)))} ({img_timestamp})")
+        
+        return True
 
     @not_implemented
     def note(self) -> bool:
