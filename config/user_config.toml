@@ -5,10 +5,8 @@ NAME = "sgommitos"
 
 [PATHS]
 PKM = "~/Desktop/pkms"               
-TEXT_EDITOR = "micro"                  
-DAILY = "daily"                     
-TEMPLATES = "templates"             
-FINANCES = "finances"               
+TEXT_EDITOR = "micro"                                       
+TEMPLATES = "templates"                            
 
 [FILE_TYPES]
 NOTES = ".md"

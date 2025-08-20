@@ -3,10 +3,11 @@ from prompt_toolkit             import prompt
 from prompt_toolkit.completion  import WordCompleter
 from prompt_toolkit.history     import FileHistory
 from prompt_toolkit.key_binding import KeyBindings
-import os
 # ------------------------------------------------- #
 
+import os
 from datetime import datetime
+import re
 
 from slibs.os_discriminator     import *
 from slibs.timing               import compute_date, wait_ms
@@ -40,20 +41,21 @@ class REPL_Commands:
         self.commands_dict = {
             # --- General Commands --- #
             
-            "help"         : [self.help,              "general_cmd", "Print a list of available cmd (within relative description)"],
-            "about"        : [self.about,             "general_cmd", "Print SW info"],
-            "credits"      : [self.credits,           "general_cmd", "Print SW credits"],
-            "clear"        : [self.clear,             "general_cmd", "Clear REPL terminal"],
-            "exit"         : [self.quit,              "general_cmd", "Quit REPL"],
-            "quit"         : [self.quit,              "general_cmd", "Quit REPL"],
-            "reload"       : [self.reload,            "general_cmd", "Reload SW configuration files"],
+            "help"         : [self.help,       "general_cmd", "Print a list of available cmd (within relative description)"],
+            "about"        : [self.about,      "general_cmd", "Print SW info"],
+            "credits"      : [self.credits,    "general_cmd", "Print SW credits"],
+            "clear"        : [self.clear,      "general_cmd", "Clear REPL terminal"],
+            "exit"         : [self.quit,       "general_cmd", "Quit REPL"],
+            "quit"         : [self.quit,       "general_cmd", "Quit REPL"],
+            "reload"       : [self.reload,     "general_cmd", "Reload SW configuration files"],
 
             # --- Notes Commands --- #
 
-            "lsn"          : [self.lsn,               "notes_cmd",   "List all your notes in setup pkm folder"],
-            "lsi"          : [self.lsi,               "notes_cmd",   "List all your imgs (.png, .jpeg, .jpg) in setup pkm folder"],
-            "random"       : [self.random,            "notes_cmd",   "Read a random note from your pkms folder"],
-            "daily"        : [self.daily,             "notes_cmd",   "Open (or create, if not exists) daily note"],
+            "sanitize"     : [self.sanitize,   "notes_cmd",   "Rename notes and imgs following a pre-defined pattern"],
+            "lsn"          : [self.lsn,        "notes_cmd",   "List all your notes in setup pkm folder"],
+            "lsi"          : [self.lsi,        "notes_cmd",   "List all your imgs (.png, .jpeg, .jpg) in setup pkm folder"],
+            "random"       : [self.random,     "notes_cmd",   "Read a random note from your pkms folder"],
+            "daily"        : [self.daily,      "notes_cmd",   "Open (or create, if not exists) daily note"],
         }
 
         self.general_commands_list = []
@@ -106,10 +108,14 @@ class REPL_Commands:
 
         return 
 
-    def _populate_pkm_file_lists(self) -> None:        
+    def _populate_pkm_file_lists(self) -> bool:
+        # Empty target dicts
+        self.pkm_notes_files = {}
+        self.pkm_imgs_files  = {}        
+        
         unsorted_files = os.listdir(self.configurator.pkm_path)
         
-        # @NOTE: get files based on the order specified in user_config; if blank, it use 'newer' order by default
+        #@NOTE: get files based on the order specified in user_config; if blank, it use 'newer' order by default
         match self.configurator.file_list_order.lower():
                 case "alphabetic" :
                     sorted_files = sorted(unsorted_files, key=str.lower)
@@ -137,7 +143,7 @@ class REPL_Commands:
                 if os.path.isfile(filepath):
                     self.pkm_imgs_files.update({filename: [filepath, datetime.fromtimestamp(os.stat(filepath).st_mtime).strftime('%Y/%m/%d - %H:%M:%S')]})
 
-        return
+        return True
     
     def _compute_pkm_notes_stats(self) -> None:
         datetimes = [note_timestamp for _, (_, note_timestamp) in self.pkm_notes_files.items()]
@@ -188,7 +194,7 @@ class REPL_Commands:
     ┃  ┃┃┃ ┃┃┗━┓
     ┗━╸╹ ╹╺┻┛┗━┛
     """
-
+    
     def get_user_input(self) -> str:
         """
         @brief: get user input, using autocomplete and history features
@@ -256,7 +262,7 @@ class REPL_Commands:
     """
     
     def reload(self) -> bool:
-        if (self.configurator._load_configs()):
+        if (self.configurator._load_configs() and self._populate_pkm_file_lists()):
             self.clear(is_logo=False)
 
             while input(fg_text("PKMS successfully reloaded! Press Return to restart REPL: ", GREEN)) is None: pass
@@ -336,11 +342,40 @@ class REPL_Commands:
     ┗━┛┗━╸
     """
 
+    def _sanitize_filename(self, filename) -> str:
+        """
+        @BRIEF: transform every filename into a str that match
+                the following patter: 'word1_word2_word3_'...
+        """
+        
+        #@NOTE    : subsistute spaces, dashed e special chars within "_"
+        #@WARNING : DO NOT SUBSISTUTE upper case within lower case         
+        sanitized = re.sub(r'[^\\w\\s]', '', filename)      # Remove special chars -> ''
+        sanitized = re.sub(r'\\s+', '_', sanitized.strip()) # Replace spaces -> underscore
+        sanitized = re.sub(r'_+', '_', sanitized)           # Replace multiple underscore -> single underscore
+
+        sanitized += self.configurator.notes_format
+        
+        return sanitized.lower()
+
+    def _rename_file(self, directory, old_filepath, old_filename, new_filename) -> str:
+        new_filepath = os.path.join(directory, new_filename)
+        
+        try:
+            os.rename(old_filepath, new_filepath)
+            return new_filepath
+        except FileExistsError:
+            print(f"{fg_text(f"ERROR: File {new_filename} already exists!", RED)}")
+            return old_filepath
+        except Exception as e:
+            print(f"{fg_text(f"ERROR while renaming {old_filename}: {e}", RED)}")
+            return old_filepath
+
     def _create_daily_note(self, daily_note_template_file: str) -> str | None:
         timestamp = compute_date()
         
         # Create daily note filename
-        daily_note_filename = f"{self.configurator.daily_path}/{timestamp}{self.configurator.notes_format}"
+        daily_note_filename = f"{self.configurator.pkm_path}/{timestamp}{self.configurator.notes_format}"
         print(daily_note_filename)
 
         # If file already exists, then just return the 'daily_note_filename' var (i.e: file path)
@@ -377,12 +412,51 @@ class REPL_Commands:
     ┗━╸╹ ╹╺┻┛┗━┛
     """
 
-    @not_fully_implemented()
-    # TODO: implement subfolders count and print, like 'daily' folder
+    @not_implemented
+    def sanitize(self) -> bool:
+        """
+        print("Are you sure you want to sanitize your pkm filenames? [y/n]: ", end="")
+        while(True):
+            user_input = input()
+
+            match user_input.lower():
+                case "y": 
+                    break
+                case "n":
+                    print(fg_text("Aborting operation", BLUE))
+                    return True
+                case _:
+                    print("Invalid input! Please retry: ", end="")
+
+        # Handle notes
+        tmp_notes_dict = {}
+        for note_name, (note_timestamp, note_path) in self.pkm_notes_files.items():
+            new_note_name = self._sanitize_filename(note_name)
+
+            if new_note_name != note_name:
+                new_note_path = self._rename_file(self.configurator.pkm_path, note_path, note_name, new_note_name)
+
+            tmp_notes_dict[new_note_name] = (note_timestamp, new_note_path)
+        self.pkm_notes_files = tmp_notes_dict                 
+        
+        # Handle imgs
+        tmp_imgs_dict = {}
+        for img_name, (img_timestamp, img_path) in self.pkm_imgs_files.items():
+            new_img_name = self._sanitize_filename(img_name)
+
+            if new_img_name != img_name:
+                new_img_path = self._rename_file(self.configurator.pkm_path, img_path, img_name, new_img_name)
+
+            tmp_imgs_dict[new_img_name] = (img_timestamp, new_img_path)
+        self.pkm_imgs_files = tmp_imgs_dict
+        """
+        pass
+        
+        
     def lsn(self) -> bool:
         stats_str = f"""
-        \rnA total of {bold_text(f"{len(self.pkm_notes_files)} notes")} was found.
-        \rYou've been keeping your note for {self.notes_delta_timestamp["years"]} year(s), {self.notes_delta_timestamp["months"]} month(s), {self.notes_delta_timestamp["days"]} day(s)!
+        \rA total of {bold_text(f"{len(self.pkm_notes_files)} notes")} was found.
+        \rYou've been keeping your notes for {self.notes_delta_timestamp["years"]} year(s), {self.notes_delta_timestamp["months"]} month(s), {self.notes_delta_timestamp["days"]} day(s)!
         """
         
         print(stats_str)
@@ -392,11 +466,9 @@ class REPL_Commands:
         
         return True
 
-    @not_fully_implemented()
-    # TODO: implement subfolders count and print, like 'daily' folder
     def lsi(self) -> bool:
         stats_str = f"""
-        \rnA total of {bold_text(f"{len(self.pkm_imgs_files)} imgs")} was found.
+        \rA total of {bold_text(f"{len(self.pkm_imgs_files)} imgs")} was found.
         """
         
         print(stats_str)
