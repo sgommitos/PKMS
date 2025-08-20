@@ -8,6 +8,7 @@
 
 import sys
 import os
+import subprocess
 
 """
 ███████ ██    ██ ███    ██  ██████ ████████ ██  ██████  ███    ██ ███████ 
@@ -21,6 +22,9 @@ def execute_os_cmd(cmd: str) -> None:
     os.system(cmd)
 
     return
+
+def execute_and_capture_os_cmd(cmd: str) -> str:
+    return subprocess.run([cmd], capture_output=True, text=True).stdout.strip().split('\n')
 
 # ======================================= #
 
