@@ -56,6 +56,13 @@ BTW, some dependencies make development a way faster and help me to provide a SW
 > When (and if, i hope :D) the project will reach a sufficiently complete and usable state, i'll summarize the main features here. <br/>
 > Anyone interested in the project can use the `help` command to quickly check which features are available (and their development status).
 
+### Development environment
+
+Actually, i'm developing using a ***Python 3.13.7* virtual enviroment (venv)** on **Endevour OS (Linux)**.
+As the project will grown, i'll go for testing it on others OS (i.e: MacOS, Windows).
+
+Also, i'll try to use it on a Linux VM on Android 16.
+
 ### Planned
 
 - [ ] Entire User-Data Folder Encryption
@@ -63,6 +70,8 @@ BTW, some dependencies make development a way faster and help me to provide a SW
 
 ### Would be nice
 
+- [ ] Android porting (more feasible)
+- [ ] iOS (less feasible, i guess)
 - [ ] Single-file Encryption
 - [ ] Community plugins
  
