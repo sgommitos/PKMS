@@ -19,6 +19,6 @@ DAILY_NOTE_TEMPLATE = "daily_note_template"
 
 [SHORTCUTS]
 # @NOTE: 'c' stands for 'CTRL' key
-help  = "c-h" # @EXAMPLE: 'c-h' correspondes to hit 'CTRL + H' keys
+help  = "f1" # @EXAMPLE: 'f1' corresponds to hitting the F1 key
 clear = "c-l"
 exit  = "c-e"                           
