@@ -348,13 +348,16 @@ class REPL_Commands:
                 the following patter: 'word1_word2_word3_'...
         """
         
+        # Split filename from its extention
+        filename_without_ext, ext = os.path.splitext(filename)
+
         #@NOTE    : subsistute spaces, dashed e special chars within "_"
         #@WARNING : DO NOT SUBSISTUTE upper case within lower case         
-        sanitized = re.sub(r'[^\\w\\s]', '', filename)      # Remove special chars -> ''
-        sanitized = re.sub(r'\\s+', '_', sanitized.strip()) # Replace spaces -> underscore
-        sanitized = re.sub(r'_+', '_', sanitized)           # Replace multiple underscore -> single underscore
+        sanitized = re.sub(r'[^\w\s]', '_', filename_without_ext)  # Remove special chars -> ''
+        sanitized = re.sub(r'\s+', '_', sanitized.strip())         # Replace spaces -> underscore
+        sanitized = re.sub(r'_+', '_', sanitized)                  # Replace multiple underscore -> single underscore
 
-        sanitized += self.configurator.notes_format
+        sanitized += ext if ext else self.configurator.notes_format
         
         return sanitized.lower()
 
@@ -363,12 +366,13 @@ class REPL_Commands:
         
         try:
             os.rename(old_filepath, new_filepath)
+            print(f"{fg_text(f"            ◦ File '{old_filename}' it's now: '{new_filename}'", GREEN)}")
             return new_filepath
         except FileExistsError:
-            print(f"{fg_text(f"ERROR: File {new_filename} already exists!", RED)}")
+            print(f"{fg_text(f"            ◦ ERROR: File '{new_filename}' already exists!", RED)}")
             return old_filepath
         except Exception as e:
-            print(f"{fg_text(f"ERROR while renaming {old_filename}: {e}", RED)}")
+            print(f"{fg_text(f"            ◦ ERROR while renaming '{old_filename}': {e}", RED)}")
             return old_filepath
 
     def _create_daily_note(self, daily_note_template_file: str) -> str | None:
@@ -412,10 +416,9 @@ class REPL_Commands:
     ┗━╸╹ ╹╺┻┛┗━┛
     """
 
-    @not_implemented
     def sanitize(self) -> bool:
-        """
-        print("Are you sure you want to sanitize your pkm filenames? [y/n]: ", end="")
+        # Make sure the user is aware of what they're doing
+        print("   1. Are you sure you want to sanitize your pkm filenames?  [y/n] : ", end="")
         while(True):
             user_input = input()
 
@@ -423,34 +426,99 @@ class REPL_Commands:
                 case "y": 
                     break
                 case "n":
-                    print(fg_text("Aborting operation", BLUE))
+                    print(fg_text("      Aborting operation", BLUE))
+                    wait_ms(self.BASIC_CMD_DELAY_MS)
                     return True
                 case _:
-                    print("Invalid input! Please retry: ", end="")
+                    print("      Invalid input! Please retry: ", end="")
 
+        is_user_check = False
+        print("   2. Do you wanna confirm renaming operation for each file? [y/n] : ", end="")
+        while(True):
+            user_input = input()
+
+            match user_input.lower():
+                case "y": 
+                    is_user_check = True
+                    break
+                case "n":
+                    break
+                case _:
+                    print("      Invalid input! Please retry: ", end="")
+
+        print()
+        print(fg_text("      Start sanitization process...", BLUE), end="")
+        print()
+        
         # Handle notes
         tmp_notes_dict = {}
-        for note_name, (note_timestamp, note_path) in self.pkm_notes_files.items():
+        notes_changed_cnt = 0
+        for note_name, (note_path, note_timestamp) in self.pkm_notes_files.items():
             new_note_name = self._sanitize_filename(note_name)
 
             if new_note_name != note_name:
-                new_note_path = self._rename_file(self.configurator.pkm_path, note_path, note_name, new_note_name)
+                if is_user_check:
+                    print(f"         ⦁ Do you wanna rename {note_name} -> {new_note_name}? [y/n]: ", end="")
+                    while(True):
+                        user_input = input()
+
+                        match user_input.lower():
+                            case "y": 
+                                new_note_path = self._rename_file(self.configurator.pkm_path, note_path, note_name, new_note_name)
+                                notes_changed_cnt += 1
+                                break
+                            case "n":
+                                break
+                            case _:
+                                print("      Invalid input! Please retry: ", end="")
+                else:
+                    new_note_path = self._rename_file(self.configurator.pkm_path, note_path, note_name, new_note_name)
+                    notes_changed_cnt += 1
+            else:
+                new_note_path = note_path
 
             tmp_notes_dict[new_note_name] = (note_timestamp, new_note_path)
-        self.pkm_notes_files = tmp_notes_dict                 
+        self.pkm_notes_files = tmp_notes_dict
+
+        print()
+        if   (notes_changed_cnt > 0) : print(f"      A total of {bold_text(notes_changed_cnt)} note(s) was sanitized")
+        else                         : print(f"      All notes filenames are already sanitized")                 
         
         # Handle imgs
         tmp_imgs_dict = {}
-        for img_name, (img_timestamp, img_path) in self.pkm_imgs_files.items():
+        imgs_changed_cnt = 0
+        for img_name, (img_path, img_timestamp) in self.pkm_imgs_files.items():
             new_img_name = self._sanitize_filename(img_name)
 
             if new_img_name != img_name:
-                new_img_path = self._rename_file(self.configurator.pkm_path, img_path, img_name, new_img_name)
+                if is_user_check:
+                    print(f"         ⦁ Do you wanna rename {img_name} -> {new_img_name}? [y/n]: ", end="")
+                    while(True):
+                        user_input = input()
+
+                        match user_input.lower():
+                            case "y": 
+                                new_img_path = self._rename_file(self.configurator.pkm_path, img_path, img_name, new_img_name)
+                                imgs_changed_cnt += 1
+                                break
+                            case "n":
+                                break
+                            case _:
+                                print("      Invalid input! Please retry: ", end="")
+                else:
+                    new_img_path = self._rename_file(self.configurator.pkm_path, img_path, img_name, new_img_name)
+                    imgs_changed_cnt += 1
+            else:
+                new_img_path = img_path
 
             tmp_imgs_dict[new_img_name] = (img_timestamp, new_img_path)
         self.pkm_imgs_files = tmp_imgs_dict
-        """
-        pass
+
+        print()
+        if   (imgs_changed_cnt > 0) : print(f"      A total of {bold_text(imgs_changed_cnt)} img(s) was sanitized")
+        else                        : print(f"      All imgs filenames are already sanitized")
+
+        return True
         
         
     def lsn(self) -> bool:
@@ -480,8 +548,9 @@ class REPL_Commands:
 
     @not_implemented
     def note(self) -> bool:
+        """
         notes_name = input("   1. Write your note's name: ")
-        
+        """
         return True
 
 
