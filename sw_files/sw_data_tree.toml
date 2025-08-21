@@ -1,9 +1,11 @@
 # PKMS: SW Data Tree configuration file
 
 [VERSION]
-MAJOR     = 0
-MINOR     = 1
-BUILD_STR = "DEV release"
+MAJOR         = 0
+MINOR         = 1
+BUILD_STR     = "DEV release"
 
 [SW_FILES_PATHS]
-HISTORY   = "sw_files/repl_history"
+CMDS_HISTORY  = "sw_files/cmds_history"
+NOTES_HISTORY = "sw_files/notes_history"
+IMGS_HISTORY  = "sw_files/imgs_history"

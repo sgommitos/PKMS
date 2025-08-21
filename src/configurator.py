@@ -29,8 +29,18 @@ class Configurator:
         
         # ====================================================================== #
 
-        self.sw_version     = f"v{self.sw_data_tree["VERSION"]["MAJOR"]}.{self.sw_data_tree["VERSION"]["MINOR"]} ({self.sw_data_tree["VERSION"]["BUILD_STR"]})"
-        self.cli_history    = self.sw_data_tree["SW_FILES_PATHS"]["HISTORY"]
+        self.sw_version              = f"v{self.sw_data_tree["VERSION"]["MAJOR"]}.{self.sw_data_tree["VERSION"]["MINOR"]} ({self.sw_data_tree["VERSION"]["BUILD_STR"]})"
+        
+        # --- History files setup --- #
+
+        # Commands
+        self.cmds_history_file       = self.sw_data_tree["SW_FILES_PATHS"]["CMDS_HISTORY"]
+
+        # Notes
+        self.notes_history_file      = self.sw_data_tree["SW_FILES_PATHS"]["NOTES_HISTORY"]
+        
+        # Imgs
+        self.imgs_history_file       = self.sw_data_tree["SW_FILES_PATHS"]["IMGS_HISTORY"]
 
     def _read_user_config_file(self) -> bool:    
         try:

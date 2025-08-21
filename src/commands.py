@@ -54,6 +54,8 @@ class REPL_Commands:
             "sanitize"     : [self.sanitize,   "notes_cmd",   "Rename notes and imgs following a pre-defined pattern"],
             "lsn"          : [self.lsn,        "notes_cmd",   "List all your notes in setup pkm folder"],
             "lsi"          : [self.lsi,        "notes_cmd",   "List all your imgs (.png, .jpeg, .jpg) in setup pkm folder"],
+            "note"         : [self.note,        "notes_cmd",  "R/W a target note"],
+            "imgs"        
             "random"       : [self.random,     "notes_cmd",   "Read a random note from your pkms folder"],
             "daily"        : [self.daily,      "notes_cmd",   "Open (or create, if not exists) daily note"],
         }
@@ -71,8 +73,21 @@ class REPL_Commands:
         self._populate_user_shortcuts_dict()
         self._setup_keybindigs() 
 
-        self.completer = WordCompleter(list(self.commands_dict.keys()))
-        self.history   = FileHistory(configurator.cli_history)
+        # --- Completer and history setup --- #
+
+        # REPL commands
+        self.cmds_completer   = WordCompleter(list(self.commands_dict.keys()))
+        self.cmds_history     = FileHistory(configurator.cmds_history_file)
+        
+        # Notes
+        self.notes_completer  = WordCompleter(list(self.pkm_notes_files.keys()))
+        self.notes_history    = FileHistory(configurator.notes_history_file)
+        self.target_note_name = None
+
+        # Imgs
+        self.imgs_completer   = WordCompleter(list(self.pkm_imgs_files.keys()))
+        self.imgs_history     = FileHistory(configurator.imgs_history_file)
+        self.target_img_name  = None
 
     def _populate_commands_lists(self) -> None:
         for cmd, (function, category, description) in self.commands_dict.items():
@@ -202,8 +217,8 @@ class REPL_Commands:
         return prompt(
             self.REPL_prompt_keyword,
             key_bindings=self.bindings,
-            completer=self.completer,
-            history=self.history
+            completer=self.cmds_completer,
+            history=self.cmds_history
         )
 
     def exec_repl_cmd(self, cmd: str):
@@ -374,6 +389,15 @@ class REPL_Commands:
         except Exception as e:
             print(f"{fg_text(f"            ◦ ERROR while renaming '{old_filename}': {e}", RED)}")
             return old_filepath
+
+    @not_implemented
+    def _write_note(self, note_name) -> None:
+        pass
+
+    @not_implemented
+    def _read_note(self, note_name) -> None:
+        pass
+
 
     def _create_daily_note(self, daily_note_template_file: str) -> str | None:
         timestamp = compute_date()
@@ -546,13 +570,56 @@ class REPL_Commands:
         
         return True
 
-    @not_implemented
+    @not_fully_implemented()
     def note(self) -> bool:
-        """
-        notes_name = input("   1. Write your note's name: ")
-        """
-        return True
+        print("   1. Write your note's name (TAB for autocompletion): ", end="")
+        while(True):
+            self.target_note_name = prompt(f"{" " * len("   1. Write your note's name (TAB for autocompletion): ")}", completer=self.notes_completer)
 
+            if not self.target_note_name in self.pkm_notes_files.keys():
+                is_new_note = False
+                print("      Note does not exists. Do you wanna create it? [y/n]: ", end="")
+                while(True):
+                    user_input = input().lower()
+
+                    match user_input:
+                        case "y":
+                            is_new_note = True
+                            break     
+                        case "n":
+                            break
+                        case _:
+                            print("         Invalid input! Please retry: ", end="")
+                if is_new_note:
+                    self._write_note()
+                    return True
+            else:
+                break
+        
+        is_note_read = False
+        print("   2. What you wanna do?: [r/w]: ", end="")    
+        while(True):
+            user_input = input().lower()
+
+            match user_input:
+                case "r":
+                    is_note_read = True
+                    break     
+                case "w":
+                    break
+                case _:
+                    print("      Invalid input! Please retry: ", end="")
+        
+        if   is_note_read : self._read_note()
+        else              : self._write_note()
+
+        return True
+    
+    @not_implemented
+    def imgs(self) -> bool:
+        self.target_img_name  = prompt("   1. Write your note's name (TAB for autocompletion): ", completer=self.imgs_completer)
+
+        return True
 
     @not_implemented
     def random(self) -> bool:

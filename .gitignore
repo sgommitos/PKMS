@@ -7,4 +7,6 @@ __pycache__/
 venv/
 
 # Prompt-toolkit
-sw_files/repl_history
+sw_files/cmds_history
+sw_files/notes_history
+sw_files/imgs_history
