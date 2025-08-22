@@ -17,6 +17,7 @@ from slibs.debug_tools          import not_implemented, to_reimplement, not_full
 from slibs.utf8_symbols         import * 
 
 from src.configurator           import Configurator
+from src.terminal_utilities     import check_used_terminal_image_support
 
 class REPL_Commands:
     
@@ -56,9 +57,9 @@ class REPL_Commands:
             "sanitize"     : [self.sanitize,   "notes_cmd",   "Rename notes and imgs following a pre-defined pattern"],
             "lsn"          : [self.lsn,        "notes_cmd",   "List all your notes in setup pkm folder"],
             "lsi"          : [self.lsi,        "notes_cmd",   "List all your imgs (.png, .jpeg, .jpg) in setup pkm folder"],
-            "note"         : [self.note,        "notes_cmd",  "R/W a target note"],
-            "imgs"        
-            "random"       : [self.random,     "notes_cmd",   "Read a random note from your pkms folder"],
+            "note"         : [self.note,       "notes_cmd",   "R/W a target note from your pkm"],
+            "img"          : [self.img,        "notes_cmd",   "Print a target img from your pkm"],       
+            "random"       : [self.random,     "notes_cmd",   "Read a random note from your pkm"],
             "daily"        : [self.daily,      "notes_cmd",   "Open (or create, if not exists) daily note"],
         }
 
@@ -503,6 +504,17 @@ class REPL_Commands:
             print(fg_text(f"Error: {e}", RED))
             return None
 
+    def _show_img(self, img_name) -> None:
+        used_terminal_obj = check_used_terminal_image_support()
+    
+        if used_terminal_obj is None:
+            print(fg_text(f"ERROR: your terminal does not support any img protocol", RED))
+            return
+        
+        used_terminal_obj.print_image(self.pkm_imgs_files[img_name][0])
+        
+        return
+
     """
     ┏━╸┏┳┓╺┳┓┏━┓
     ┃  ┃┃┃ ┃┃┗━┓
@@ -692,11 +704,20 @@ class REPL_Commands:
 
         return True
     
-    @not_implemented
-    def imgs(self) -> bool:
-        target_img_name  = prompt("   1. Write your note's name (TAB for autocompletion): ", completer=self.imgs_completer)
+    def img(self) -> bool:
+        while(True):
+            target_img_name = prompt("   1. Write your img's name (TAB for autocompletion, Return to exit): ", completer=self.imgs_completer)
 
-        return True
+            if   target_img_name == "":
+                print(f"      {fg_text(f"{WARNING_TRIANGLE} Aborting operation", BLUE)}")
+                return True # @NOTE: exit from 'img' submenu
+            
+            if target_img_name in self.pkm_imgs_files.keys():
+                self._show_img(target_img_name)
+                
+                return True
+            else:
+                print(f"      {fg_text("ERROR: selected img does not exists!", RED)}", end="")
 
     @not_implemented
     def random(self) -> bool:
@@ -709,5 +730,4 @@ class REPL_Commands:
         if daily_note_filename:
             execute_os_cmd(f"{self.configurator.text_editor} {daily_note_filename}")
 
-        return True  
-    
+        return True
