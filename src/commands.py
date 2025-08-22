@@ -5,6 +5,7 @@ from prompt_toolkit.history     import FileHistory
 from prompt_toolkit.key_binding import KeyBindings
 # ------------------------------------------------- #
 
+from pathlib import Path
 import os
 from datetime import datetime
 import re
@@ -408,7 +409,24 @@ class REPL_Commands:
         print(f"{DIVIDER_SYMBOL_DOWNER * longest_line_size} ")
         
         return
+    
+    def _has_extension(self, file_name: str) -> str | None:
+        file_ext = Path(file_name).suffix
+        
+        return file_ext if file_ext else None
+    
+    def _replace_extension(self, file_name: str, target_ext: str) -> str:
+        return str(Path(file_name).with_suffix(target_ext))
 
+    def _handle_note_extension(self, note_name: str) -> str:
+        note_ext = self._has_extension(note_name)
+
+        if note_ext is None or note_ext != self.configurator.notes_format:
+            new_note_name = self._replace_extension(note_name, self.configurator.notes_format)
+        else:
+            new_note_name = note_name
+        
+        return new_note_name 
 
     def _create_daily_note(self, daily_note_template_file: str) -> str | None:
         timestamp = compute_date()
@@ -583,7 +601,11 @@ class REPL_Commands:
 
     def note(self) -> bool:
         while(True):
-            target_note_name = prompt("   1. Write your note's name (TAB for autocompletion): ", completer=self.notes_completer)
+            target_note_name = prompt("   1. Write your note's name (TAB for autocompletion, Return to exit): ", completer=self.notes_completer)
+
+            if target_note_name == "":
+                print(f"      {fg_text(f"{WARNING_TRIANGLE} Aborting operation", BLUE)}")
+                return True # @NOTE: exit from 'note' submenu
 
             if not target_note_name in self.pkm_notes_files.keys():
                 is_new_note = False
@@ -601,7 +623,7 @@ class REPL_Commands:
                         case _:
                             print(f"         {WARNING_TRIANGLE} Invalid input! Please retry: ", end="")
                 if is_new_note:
-                    self._write_note(target_note_name, is_new_note=True)
+                    self._write_note(self._handle_note_extension(target_note_name), is_new_note=True)
                     return True
             else:
                 break
@@ -628,7 +650,7 @@ class REPL_Commands:
     @not_implemented
     def imgs(self) -> bool:
         target_img_name  = prompt("   1. Write your note's name (TAB for autocompletion): ", completer=self.imgs_completer)
-        
+
         return True
 
     @not_implemented
