@@ -5,6 +5,8 @@ from prompt_toolkit.history     import FileHistory
 from prompt_toolkit.key_binding import KeyBindings
 # ------------------------------------------------- #
 
+import random # Manly for 'random' cmd implementation
+
 from pathlib import Path
 import os
 from datetime import datetime
@@ -59,7 +61,7 @@ class REPL_Commands:
             "lsi"          : [self.lsi,        "notes_cmd",   "List all your imgs (.png, .jpeg, .jpg) in setup pkm folder"],
             "note"         : [self.note,       "notes_cmd",   "R/W a target note from your pkm"],
             "img"          : [self.img,        "notes_cmd",   "Print a target img from your pkm"],       
-            "random"       : [self.random,     "notes_cmd",   "Read a random note from your pkm"],
+            "random"       : [self.random,     "notes_cmd",   "Read/Show a random note/img from your pkm"],
             "daily"        : [self.daily,      "notes_cmd",   "Open (or create, if not exists) daily note"],
         }
 
@@ -719,9 +721,22 @@ class REPL_Commands:
             else:
                 print(f"      {fg_text("ERROR: selected img does not exists!", RED)}", end="")
 
-    @not_implemented
     def random(self) -> bool:
-        pass
+        random_dict = random.choice([self.pkm_notes_files, self.pkm_imgs_files])
+        random_file = random.choice(list(random_dict.keys()))
+        
+        match random_dict:
+            case self.pkm_notes_files:
+                print(italic_text(f"Here's '{bold_text(random_file)}' note from {self.pkm_notes_files[random_file][1]}:"))
+                self._read_note(random_file)
+            case self.pkm_imgs_files:
+                print(italic_text(f"Here's '{bold_text(random_file)}' img from {self.pkm_imgs_files[random_file][1]}:"))
+                self._show_img(random_file)
+            case _:
+                print(fg_text("WTF why are you here? Please tell sgommitos that he has fucked up something in 'random' function", RED))
+                fail_return()
+            
+        return True
 
     def daily(self) -> bool:
         daily_note_template_file = f"{self.configurator.templates_path}/{self.configurator.user_config["TEMPLATES"]["DAILY_NOTE_TEMPLATE"]}{self.configurator.notes_format}"

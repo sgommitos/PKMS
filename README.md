@@ -58,8 +58,8 @@ BTW, some dependencies make development a way faster and help me to provide a SW
 
 ### Development environment
 
-Actually, i'm developing using a ***Python 3.13.7* virtual enviroment (venv)** on **Endevour OS (Linux)**.
-As the project will grown, i'll go for testing it on others OS (i.e: MacOS, Windows).
+Actually, i'm developing using a ***Python 3.13.7* virtual enviroment (venv)** on **Endevour OS (Linux)**. Used terminal is [`kitty`](https://sw.kovidgoyal.net/kitty/), thanks to its image rendering support.
+As the project will grow, i'll go for testing it on others OS (i.e: MacOS, Windows).
 
 Also, i'll try to use it on a Linux VM on Android 16.
 
