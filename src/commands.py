@@ -84,11 +84,13 @@ class REPL_Commands:
         self.cmds_history     = FileHistory(configurator.cmds_history_file)
         
         # Notes
-        self.notes_completer  = WordCompleter(list(self.pkm_notes_files.keys()))
+        self.notes_completer  = None 
+        self._update_notes_completer()
         self.notes_history    = FileHistory(configurator.notes_history_file)
 
         # Imgs
-        self.imgs_completer   = WordCompleter(list(self.pkm_imgs_files.keys()))
+        self.imgs_completer   = None
+        self._update_imgs_completer()
         self.imgs_history     = FileHistory(configurator.imgs_history_file)
 
     def _setup_pkm_folder(self) -> None:
@@ -217,6 +219,16 @@ class REPL_Commands:
 
         return
 
+    def _update_notes_completer(self) -> None:
+        self.notes_completer = WordCompleter(list(self.pkm_notes_files.keys()))
+
+        return
+
+    def _update_imgs_completer(self):
+        self.imgs_completer = WordCompleter(list(self.pkm_imgs_files.keys()))
+
+        return
+
     """
     ┏━╸┏┳┓╺┳┓┏━┓
     ┃  ┃┃┃ ┃┃┗━┓
@@ -290,7 +302,12 @@ class REPL_Commands:
     """
     
     def reload(self) -> bool:
-        if (self.configurator._load_configs() and self._populate_pkm_file_lists()):
+        if self.configurator._load_configs():    
+            self._populate_pkm_file_lists()
+            
+            self._update_notes_completer()
+            self._update_imgs_completer()
+            
             self.clear(is_logo=False)
 
             while input(fg_text("PKMS successfully reloaded! Press Return to restart REPL: ", GREEN)) is None: pass
@@ -411,8 +428,15 @@ class REPL_Commands:
 
         return
     
-    def _delete_file(self, file_name) -> bool:
-        pass
+    def _delete_file(self, file_path) -> None:
+        Path(file_path).unlink()
+
+        return
+    
+    def _move_file_to_deleted_files_folder(self, file_name, file_path) -> None:
+        Path(file_path).rename(f"{self.configurator.deleted_path}/{file_name}")
+
+        return
 
     def _read_note(self, note_name) -> None:
         note_path = self.pkm_notes_files[note_name][0]
@@ -656,9 +680,10 @@ class REPL_Commands:
                 case "w":
                     break
                 case "d":
-                    if self._delete_file(target_note_name):
-                        print(f"         {fg_text(f"{EMPTY_BULLET_POINT} Note deleted", RED)}", end="")
-                        return True
+                    self._move_file_to_deleted_files_folder(target_note_name, self.pkm_notes_files[target_note_name][0])
+                    
+                    print(f"         {fg_text(f"{EMPTY_BULLET_POINT} Note moved to 'deleted' subfolder", RED)}", end="")
+                    return True
                 case _:
                     print(f"         {WARNING_TRIANGLE} Invalid input! Please retry: ", end="")
         
