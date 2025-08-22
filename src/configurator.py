@@ -16,10 +16,16 @@ class Configurator:
  
         self.user                    = self.user_config["USER_DATA"]["NAME"]
         
+        # --- Paths --- #
+
+        # PKM related
         self.pkm_path                = Path(self.user_config["PATHS"]["PKM"]).expanduser()
+        self.deleted_path            = f"{self.pkm_path}/{self.user_config["PATHS"]["DELETED_FILES"]}"
         
+        # SW folder related
         self.templates_path          = f"{self.sw_path}/{self.user_config["PATHS"]["TEMPLATES"]}"
-        
+
+        # External tools related 
         self.text_editor             = self.user_config["PATHS"]["TEXT_EDITOR"]
         self.print_tool              = self.user_config["PATHS"]["PRINT_TOOL"]
 

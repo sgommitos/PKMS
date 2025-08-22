@@ -62,6 +62,8 @@ class REPL_Commands:
             "daily"        : [self.daily,      "notes_cmd",   "Open (or create, if not exists) daily note"],
         }
 
+        self._setup_pkm_folder()
+
         self.general_commands_list = []
         self.notes_commands_list   = []
         self._populate_commands_lists()
@@ -88,6 +90,17 @@ class REPL_Commands:
         # Imgs
         self.imgs_completer   = WordCompleter(list(self.pkm_imgs_files.keys()))
         self.imgs_history     = FileHistory(configurator.imgs_history_file)
+
+    def _setup_pkm_folder(self) -> None:
+        # 1. Check if user's pkm folder exists
+        if not is_folder_exists(self.configurator.pkm_path):
+            print(fg_text("ERROR: PKM Folder does not exists! Please check path in config/user_config.toml file", RED))
+            fail_return()
+
+        # 2. Create pkm-specific folders
+        create_folder(self.configurator.deleted_path)
+
+        return
 
     def _populate_commands_lists(self) -> None:
         for cmd, (function, category, description) in self.commands_dict.items():
@@ -397,6 +410,9 @@ class REPL_Commands:
             execute_os_cmd(f"{self.configurator.text_editor} \"{self.pkm_notes_files[note_name][0]}\"")
 
         return
+    
+    def _delete_file(self, file_name) -> bool:
+        pass
 
     def _read_note(self, note_name) -> None:
         note_path = self.pkm_notes_files[note_name][0]
@@ -629,7 +645,7 @@ class REPL_Commands:
                 break
         
         is_read_operation = False
-        print("   2. What you wanna do?: [r/w]: ", end="")    
+        print("   2. What you wanna do?: [r/w/d]: ", end="")    
         while(True):
             user_input = input().lower()
 
@@ -639,6 +655,10 @@ class REPL_Commands:
                     break     
                 case "w":
                     break
+                case "d":
+                    if self._delete_file(target_note_name):
+                        print(f"         {fg_text(f"{EMPTY_BULLET_POINT} Note deleted", RED)}", end="")
+                        return True
                 case _:
                     print(f"         {WARNING_TRIANGLE} Invalid input! Please retry: ", end="")
         

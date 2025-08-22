@@ -6,10 +6,16 @@
 NAME                = "sgommitos"
 
 [PATHS]
+# PKM related
 PKM                 = "~/Desktop/pkms"               
-TEXT_EDITOR         = "micro"
-PRINT_TOOL          = "cat" # you can also use more advanced MarkDown renderer, such as 'glow' -> https://github.com/charmbracelet/glow                                     
+DELETED_FILES       = "deleted"
+
+# SW folder related
 TEMPLATES           = "templates"                            
+
+# External tools related 
+PRINT_TOOL          = "cat" # you can also use more advanced MarkDown renderer, such as 'glow' -> https://github.com/charmbracelet/glow                                     
+TEXT_EDITOR         = "micro"
 
 [FILE_TYPES]
 NOTES               = ".md"
