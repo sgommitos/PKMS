@@ -23,8 +23,8 @@ def execute_os_cmd(cmd: str) -> None:
 
     return
 
-def execute_and_capture_os_cmd(cmd: str) -> str:
-    return subprocess.run([cmd], capture_output=True, text=True).stdout.strip().split('\n')
+def execute_and_capture_os_cmd(cmd: list) -> str:
+    return subprocess.run(cmd, capture_output=True, text=True).stdout.strip()
 
 # ======================================= #
 

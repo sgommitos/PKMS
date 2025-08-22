@@ -13,6 +13,7 @@ from slibs.os_discriminator     import *
 from slibs.timing               import compute_date, wait_ms
 from slibs.printl               import fg_text, bg_text, italic_text, bold_text, RED, GREEN, BLUE
 from slibs.debug_tools          import not_implemented, to_reimplement, not_fully_implemented
+from slibs.utf8_symbols         import * 
 
 from src.configurator           import Configurator
 
@@ -82,12 +83,10 @@ class REPL_Commands:
         # Notes
         self.notes_completer  = WordCompleter(list(self.pkm_notes_files.keys()))
         self.notes_history    = FileHistory(configurator.notes_history_file)
-        self.target_note_name = None
 
         # Imgs
         self.imgs_completer   = WordCompleter(list(self.pkm_imgs_files.keys()))
         self.imgs_history     = FileHistory(configurator.imgs_history_file)
-        self.target_img_name  = None
 
     def _populate_commands_lists(self) -> None:
         for cmd, (function, category, description) in self.commands_dict.items():
@@ -235,7 +234,7 @@ class REPL_Commands:
         sw_splashscreen = f"""
 ██████╗ ██╗  ██╗███╗   ███╗███████╗
 ██╔══██╗██║ ██╔╝████╗ ████║██╔════╝
-██████╔╝█████╔╝ ██╔████╔██║███████╗   SW version ⇲
+██████╔╝█████╔╝ ██╔████╔██║███████╗   SW version {STYLED_SOUTHWEST_ARROW}
 ██╔═══╝ ██╔═██╗ ██║╚██╔╝██║╚════██║   {self.configurator.sw_version}
 ██║     ██║  ██╗██║ ╚═╝ ██║███████║
 ╚═╝     ╚═╝  ╚═╝╚═╝     ╚═╝╚══════╝ 
@@ -390,13 +389,25 @@ class REPL_Commands:
             print(f"{fg_text(f"            ◦ ERROR while renaming '{old_filename}': {e}", RED)}")
             return old_filepath
 
-    @not_implemented
-    def _write_note(self, note_name) -> None:
-        pass
+    def _write_note(self, note_name, is_new_note) -> None:
+        if is_new_note:
+            execute_os_cmd(f"{self.configurator.text_editor} \"{self.configurator.pkm_path}/{note_name}\"")
+        else:
+            execute_os_cmd(f"{self.configurator.text_editor} \"{self.pkm_notes_files[note_name][0]}\"")
 
-    @not_implemented
+        return
+
     def _read_note(self, note_name) -> None:
-        pass
+        note_path = self.pkm_notes_files[note_name][0]
+        longest_line_size = int(execute_and_capture_os_cmd(["wc", "-L" , note_path]).split(" ")[0])
+
+        print(end="\n\n") # @NOTE: add some vertical spacing before printing (i guess it's more readable)
+
+        print(f"{DIVIDER_SYMBOL_UPPER * longest_line_size} ")
+        execute_os_cmd(f"{self.configurator.print_tool} \"{note_path}\"")
+        print(f"{DIVIDER_SYMBOL_DOWNER * longest_line_size} ")
+        
+        return
 
 
     def _create_daily_note(self, daily_note_template_file: str) -> str | None:
@@ -570,15 +581,13 @@ class REPL_Commands:
         
         return True
 
-    @not_fully_implemented()
     def note(self) -> bool:
-        print("   1. Write your note's name (TAB for autocompletion): ", end="")
         while(True):
-            self.target_note_name = prompt(f"{" " * len("   1. Write your note's name (TAB for autocompletion): ")}", completer=self.notes_completer)
+            target_note_name = prompt("   1. Write your note's name (TAB for autocompletion): ", completer=self.notes_completer)
 
-            if not self.target_note_name in self.pkm_notes_files.keys():
+            if not target_note_name in self.pkm_notes_files.keys():
                 is_new_note = False
-                print("      Note does not exists. Do you wanna create it? [y/n]: ", end="")
+                print(f"      {FILLED_BULLET_POINT} Note does not exists. Do you wanna create it? [y/n]: ", end="")
                 while(True):
                     user_input = input().lower()
 
@@ -587,38 +596,39 @@ class REPL_Commands:
                             is_new_note = True
                             break     
                         case "n":
-                            break
+                            print(f"         {fg_text(f"{WARNING_TRIANGLE} Aborting operation", BLUE)}")
+                            return True # @NOTE: exit from 'note' submenu
                         case _:
-                            print("         Invalid input! Please retry: ", end="")
+                            print(f"         {WARNING_TRIANGLE} Invalid input! Please retry: ", end="")
                 if is_new_note:
-                    self._write_note()
+                    self._write_note(target_note_name, is_new_note=True)
                     return True
             else:
                 break
         
-        is_note_read = False
+        is_read_operation = False
         print("   2. What you wanna do?: [r/w]: ", end="")    
         while(True):
             user_input = input().lower()
 
             match user_input:
                 case "r":
-                    is_note_read = True
+                    is_read_operation = True
                     break     
                 case "w":
                     break
                 case _:
-                    print("      Invalid input! Please retry: ", end="")
+                    print(f"         {WARNING_TRIANGLE} Invalid input! Please retry: ", end="")
         
-        if   is_note_read : self._read_note()
-        else              : self._write_note()
+        if   is_read_operation : self._read_note(target_note_name)
+        else                   : self._write_note(target_note_name, is_new_note=False)
 
         return True
     
     @not_implemented
     def imgs(self) -> bool:
-        self.target_img_name  = prompt("   1. Write your note's name (TAB for autocompletion): ", completer=self.imgs_completer)
-
+        target_img_name  = prompt("   1. Write your note's name (TAB for autocompletion): ", completer=self.imgs_completer)
+        
         return True
 
     @not_implemented
