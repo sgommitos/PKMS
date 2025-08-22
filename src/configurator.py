@@ -37,7 +37,11 @@ class Configurator:
         
         # ====================================================================== #
 
-        self.sw_version              = f"v{self.sw_data_tree["VERSION"]["MAJOR"]}.{self.sw_data_tree["VERSION"]["MINOR"]} ({self.sw_data_tree["VERSION"]["BUILD_STR"]})"
+        sw_version_major             = 0
+        sw_version_minor             = 2
+        sw_version_release_type      = "DEV release"
+
+        self.sw_version              = f"v{sw_version_major}.{sw_version_minor} ({sw_version_release_type})"
         
         # --- History files setup --- #
 
