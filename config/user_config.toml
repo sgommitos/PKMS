@@ -1,18 +1,21 @@
-# PKMS: User configuration file
+# ░█▀█░█░█░█▄█░█▀▀░░░░░░░█░█░█▀▀░█▀▀░█▀▄░░░█▀▀░█▀█░█▀█░█▀▀░▀█▀░█▀▀░█░█░█▀▄░█▀█░▀█▀░▀█▀░█▀█░█▀█░░░█▀▀░▀█▀░█░░░█▀▀ 
+# ░█▀▀░█▀▄░█░█░▀▀█░░▀░░░░█░█░▀▀█░█▀▀░█▀▄░░░█░░░█░█░█░█░█▀▀░░█░░█░█░█░█░█▀▄░█▀█░░█░░░█░░█░█░█░█░░░█▀▀░░█░░█░░░█▀▀
+# ░▀░░░▀░▀░▀░▀░▀▀▀░░▀░░░░▀▀▀░▀▀▀░▀▀▀░▀░▀░░░▀▀▀░▀▀▀░▀░▀░▀░░░▀▀▀░▀▀▀░▀▀▀░▀░▀░▀░▀░░▀░░▀▀▀░▀▀▀░▀░▀░░░▀░░░▀▀▀░▀▀▀░▀▀▀
 
 [USER_DATA]
-NAME = "sgommitos"
+NAME                = "sgommitos"
 
 [PATHS]
-PKM = "~/Desktop/pkms"               
-TEXT_EDITOR = "micro"                                       
-TEMPLATES = "templates"                            
+PKM                 = "~/Desktop/pkms"               
+TEXT_EDITOR         = "micro"
+PRINT_TOOL          = "cat" # you can also use more advanced MarkDown renderer, such as 'glow' -> https://github.com/charmbracelet/glow                                     
+TEMPLATES           = "templates"                            
 
 [FILE_TYPES]
-NOTES = ".md"
+NOTES               = ".md"
 
 [FILE_ORDER]
-LIST = "newer" # Available order filters: "alphabetic", "older", "newer"           
+LIST                = "newer" # Available order filters: "alphabetic", "older", "newer"           
 
 [TEMPLATES]
 DAILY_NOTE_TEMPLATE = "daily_note_template"  

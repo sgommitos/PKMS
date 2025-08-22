@@ -21,6 +21,8 @@ class Configurator:
         self.templates_path          = f"{self.sw_path}/{self.user_config["PATHS"]["TEMPLATES"]}"
         
         self.text_editor             = self.user_config["PATHS"]["TEXT_EDITOR"]
+        self.print_tool              = self.user_config["PATHS"]["PRINT_TOOL"]
+
         self.notes_format            = self.user_config["FILE_TYPES"]["NOTES"]
 
         self.file_list_order         = self.user_config["FILE_ORDER"]["LIST"]
