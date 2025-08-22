@@ -1,7 +1,9 @@
 # README
 
+> (**last release: v0.2** ⟹ release page [here](https://github.com/sgommitos/PKMS/releases/))
+
 > [!WARNING] 
-> This SW is at the early stage of development (**last release: v0.2** ⟹ release page [here](https://github.com/sgommitos/PKMS/releases/)) ⟹ it could be affected by major changes. <br/><br/>
+> This SW is at the early stage of development ⟹ it could be affected by major changes. <br/><br/>
 > Also, consider that it's developed as a side-project without any pretention, so the SW architecture will grow within time (and personal needs :P). <br/><br/>
 > As i started these project during my holidays (i'm honestly writing this `README` next to the pool), i'm aware that i will need to enhanced project structure and logic. <br/><br/>
 > ***Issues*, *PR* and suggestions are always valued!**
@@ -35,7 +37,14 @@ Due to that, `PKMS` will be (mainly)[^2] developed using `Python`.
 
 ## How it works
 
-TBI.
+In order to make it works:
+1. Clone the repository: `git clone https://github.com/sgommitos/PKMS.git`
+2. Move the terminal inside the cloned folder: `cd PKMS`
+3. Create a `Python venv` inside it ⟹ activate it (here's the [full official guide](https://docs.python.org/3/library/venv.html))
+    - For example, on a Linux distribution, just execute:
+        i. `python3.13 -m venv venv`
+        ii. `source venv/bin/activate` 
+4. Install the required libraries: `pip install -r requirements.txt`
 
 ## Dependencies
 
